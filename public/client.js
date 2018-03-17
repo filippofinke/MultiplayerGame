@@ -1,6 +1,6 @@
 const SOCKET = io();
 const IMAGE = 'img/player.png';
-let GAME = "";
+let GAME = '';
 const GAME_X = 500;
 const GAME_Y = 500;
 const PLAYER_HEIGHT = 100;
@@ -9,8 +9,10 @@ const SPEED = 10;
 var NAME = '';
 var players = [];
 var player = '';
+var direction = 'FORWARD';
+var moved = true;
 
-document.addEventListener("DOMContentLoaded", function(event) {
+document.addEventListener('DOMContentLoaded', function(event) {
   GAME = document.getElementById('game');
 });
 
@@ -48,6 +50,9 @@ function getRandomNumber(min, max) {
 }
 
 function move(event) {
+  if (!moved) {
+    return;
+  }
   var key = event.code;
   var position = {
     X: Number(player.style.left.replace('px', '')),
@@ -55,12 +60,16 @@ function move(event) {
   };
   if (key == 'KeyW') {
     position.Y -= SPEED;
+    direction = 'FORWARD';
   } else if (key == 'KeyA') {
     position.X -= SPEED;
+    direction = 'LEFT';
   } else if (key == 'KeyS') {
     position.Y += SPEED;
+    direction = 'BACK';
   } else if (key == 'KeyD') {
     position.X += SPEED;
+    direction = 'RIGHT';
   }
 
   if (position.X < 0) {
@@ -96,6 +105,7 @@ SOCKET.on('update', function(data) {
 });
 
 SOCKET.on('move', function(data) {
+  moved = true;
   console.log('Aggiorno le posizioni');
   for (var a = 0; a < data.length; a++) {
     for (var i = 0; i < players.length; i++) {
