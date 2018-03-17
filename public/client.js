@@ -65,7 +65,7 @@ function move(event) {
     Y: Number(player.style.top.replace('px', '')),
     DIRECTION: direction
   };
-  if (key == 'KeyW') {
+  /*if (key == 'KeyW') {
     position.Y -= SPEED;
     direction = 'FORWARD';
   } else if (key == 'KeyA') {
@@ -77,6 +77,30 @@ function move(event) {
   } else if (key == 'KeyD') {
     position.X += SPEED;
     direction = 'RIGHT';
+  }*/
+
+  switch (key) {
+
+    case 'KeyW':
+    position.Y -= SPEED;
+    direction = 'FORWARD';
+    break;
+
+    case 'KeyA':
+    position.X -= SPEED;
+    direction = 'LEFT';
+    break;
+
+    case 'KeyS':
+    position.Y += SPEED;
+    direction = 'BACK';
+    break;
+
+    case 'KeyD':
+    position.X += SPEED;
+    direction = 'RIGHT';
+    break;
+
   }
 
   if (position.X < 0) {
@@ -88,8 +112,10 @@ function move(event) {
   } else if (position.Y > GAME_Y - PLAYER_HEIGHT) {
     position.Y = GAME_Y  - PLAYER_HEIGHT;
   }
-  player.style.top = Number(position.Y) + 'px';
-  player.style.left = Number(position.X) + 'px';
+  /*player.style.top = Number(position.Y) + 'px';
+  player.style.left = Number(position.X) + 'px';*/
+  player.style.top = "" + position.Y + 'px';
+  player.style.left = "" + position.X + 'px';
   console.log('Mando la mia posizione');
   SOCKET.emit('move', position);
 }
