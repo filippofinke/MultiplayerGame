@@ -1,3 +1,8 @@
+const DEBUG = false;
+if (!DEBUG) {
+  console.log = function() {};
+}
+
 const SOCKET = io();
 const IMAGE = 'img/player.png';
 let GAME = '';
@@ -56,7 +61,8 @@ function move(event) {
   var key = event.code;
   var position = {
     X: Number(player.style.left.replace('px', '')),
-    Y: Number(player.style.top.replace('px', ''))
+    Y: Number(player.style.top.replace('px', '')),
+    DIRECTION: direction
   };
   if (key == 'KeyW') {
     position.Y -= SPEED;

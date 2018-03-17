@@ -4,7 +4,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 const util = require('util');
 
-app.use("/", express.static(__dirname + "/public"));
+app.use('/', express.static(__dirname + '/public'));
 
 http.listen(80, function() {
   console.log('Server avviato sulla porta 80!');
@@ -13,9 +13,10 @@ http.listen(80, function() {
 var players = [];
 
 var Player = class Player {
-  constructor(name, x, y) {
+  constructor(name, x, y, direction) {
     this.x = x;
     this.y = y;
+    this.direction = direction;
     this.name = name;
   }
 };
@@ -49,6 +50,7 @@ io.on('connection', function(socket) {
   socket.on('move', function(data) {
     player.x = data.X;
     player.y = data.Y;
+    player.direction = data.DIRECTION;
     io.sockets.emit('move', getPlayers());
   });
 
