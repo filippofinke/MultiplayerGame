@@ -147,8 +147,8 @@ SOCKET.on('quit', function(data) {
   }
 });
 
-SOCKET.on('disconnect', function(){
-  document.write("Connessione con il server persa!");
+SOCKET.on('disconnect', function() {
+  document.write('Connessione con il server persa!');
 });
 
 function removeArray(name, array) {
