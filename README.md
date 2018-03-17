@@ -9,8 +9,8 @@
 ### Come installarlo:
 * Scaricare ed installare nodejs
 * Scaricare il progetto
-* Aprire un terminale e digitare node app.js
-* Recarsi su http://localhost
+* Aprire un terminale e digitare node server.js
+* Recarsi su http://localhost:80
 * Fine
 
 ### Descrizione:
