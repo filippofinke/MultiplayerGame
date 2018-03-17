@@ -169,13 +169,3 @@ function removeArray(name, array) {
     array.splice(index, 1);
   }
 }
-
-
-/*
-Funzione per muovere omino random
-setInterval(test, 50);
-function test()
-{
-  var d = ["KeyW","KeyS","KeyD","KeyA"];
-  move({code: d[Math.floor(Math.random() * d.length)]});
-}*/
