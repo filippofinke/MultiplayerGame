@@ -88,6 +88,8 @@ function move(event) {
   } else if (position.Y > GAME_Y - PLAYER_HEIGHT) {
     position.Y = GAME_Y  - PLAYER_HEIGHT;
   }
+  player.style.top = Number(position.Y) + 'px';
+  player.style.left = Number(position.X) + 'px';
   console.log('Mando la mia posizione');
   SOCKET.emit('move', position);
 }
@@ -116,6 +118,12 @@ SOCKET.on('move', function(data) {
   console.log('Aggiorno le posizioni');
   for (var a = 0; a < data.length; a++) {
     for (var i = 0; i < players.length; i++) {
+      if (data[a].name == NAME) {
+        players[i].x = data[a].x;
+        players[i].y = data[a].y;
+        players[i].direction = data[a].direction;
+        continue;
+      }
       if (data[a].name == players[i].name) {
         players[i].element.style.top = Number(data[a].y) + 'px';
         players[i].element.style.left = Number(data[a].x) + 'px';
