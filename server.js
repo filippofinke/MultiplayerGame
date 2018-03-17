@@ -41,7 +41,7 @@ io.on('connection', function(socket) {
   console.log('[Info] Nuovo utente collegato ' + socket.id);
   socket.on('new', function(data) {
     console.log('[Info] Nuovo giocatore creato!');
-    player = new Player(socket.id, data.X, data.Y);
+    player = new Player(socket.id, data.X, data.Y, data.DIRECTION);
     addPlayer(player);
     socket.emit('new', getPlayers());
     socket.broadcast.emit('update', player);

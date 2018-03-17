@@ -32,7 +32,8 @@ function spawnPlayer() {
   player.style.top = getRandomNumber(0, GAME_Y - PLAYER_HEIGHT) + 'px';
   var position = {
     X: Number(player.style.left.replace('px', '')),
-    Y: Number(player.style.top.replace('px', ''))
+    Y: Number(player.style.top.replace('px', '')),
+    DIRECTION: direction
   };
   GAME.appendChild(player);
   SOCKET.emit('new', position);
@@ -100,14 +101,14 @@ SOCKET.on('new', function(data) {
     } else {
       p = player;
     }
-    players.push({element: p, name: data[i].name, x: data[i].x, y: data[i].y});
+    players.push({element: p, name: data[i].name, x: data[i].x, y: data[i].y, direction: data[i].direction});
   }
 });
 
 SOCKET.on('update', function(data) {
   console.log('Nuovo giocatore connesso');
   var p = createPlayer(data.name, data.x, data.y);
-  players.push({element: p, name: data.name, x: data.x, y: data.y});
+  players.push({element: p, name: data.name, x: data.x, y: data.y, direction: data.direction});
 });
 
 SOCKET.on('move', function(data) {
@@ -118,6 +119,9 @@ SOCKET.on('move', function(data) {
       if (data[a].name == players[i].name) {
         players[i].element.style.top = Number(data[a].y) + 'px';
         players[i].element.style.left = Number(data[a].x) + 'px';
+        players[i].x = data[a].x;
+        players[i].y = data[a].y;
+        players[i].direction = data[a].direction;
         break;
       }
     }
