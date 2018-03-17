@@ -4,7 +4,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 const util = require('util');
 
-app.use("/", express.static(__dirname));
+app.use("/", express.static(__dirname + "/public"));
 
 http.listen(80, function() {
   console.log('Server avviato sulla porta 80!');
