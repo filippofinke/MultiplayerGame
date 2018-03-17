@@ -35,3 +35,9 @@ In questa base ci sono le seguenti caratteristiche:
 
 
 Ringrazio tutti i contributori del progetto!
+
+
+------------
+
+
+>  [Licenza](LICENSE)
