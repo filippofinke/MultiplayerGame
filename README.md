@@ -34,4 +34,4 @@ In questa base ci sono le seguenti caratteristiche:
 ------------
 
 
-Ringrazio tutti i contributori al progetto :fa-check-circle:
+Ringrazio tutti i contributori del progetto!
