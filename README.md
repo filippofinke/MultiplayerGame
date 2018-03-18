@@ -41,3 +41,6 @@ Ringrazio tutti i contributori del progetto!
 
 
 >  [Licenza](LICENSE)
+
+
+------------
