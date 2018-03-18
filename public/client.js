@@ -12,13 +12,13 @@ const GAME_X = 500;
 const GAME_Y = 500;
 const PLAYER_HEIGHT = 75;
 const PLAYER_WIDTH = 75;
-const SPEED = 10;
+const SPEED = 5;
 var NAME = '';
 var players = [];
 var player = '';
 var direction = 'FORWARD';
 var lastKey = '';
-setInterval(move, 50);
+setInterval(move, 20);
 document.addEventListener('DOMContentLoaded', function(event) {
   GAME = document.getElementById('game');
 });
@@ -169,7 +169,7 @@ SOCKET.on('log', function(data) {
 });
 
 SOCKET.on('disconnect', function() {
-  document.write('Connessione con il server persa!');
+  alert("Connessione con il server persa!");
 });
 
 function removeArray(name, array) {
@@ -186,10 +186,6 @@ function moveInterval(event) {
 function getImage(img, dir)
 {
   dir = dir.toLowerCase();
-  if(dir == "back")
-  {
-    dir = "right";
-  }
   var temp = img.split("/");
   return temp[0] + "/" + dir + temp[1];
 }
