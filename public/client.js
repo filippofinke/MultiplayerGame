@@ -83,6 +83,9 @@ function move(event) {
       direction = 'RIGHT';
     break;
 
+    default:
+      return;
+
   }
 
   if (position.X < 0) {
