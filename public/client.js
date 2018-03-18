@@ -10,7 +10,6 @@ var NAME = '';
 var players = [];
 var player = '';
 var direction = 'FORWARD';
-var moved = true;
 
 document.addEventListener('DOMContentLoaded', function(event) {
   GAME = document.getElementById('game');
@@ -51,9 +50,6 @@ function getRandomNumber(min, max) {
 }
 
 function move(event) {
-  if (!moved) {
-    return;
-  }
   var key = event.code;
   var position = {
     X: Number(player.style.left.replace('px', '')),
@@ -124,7 +120,6 @@ SOCKET.on('update', function(data) {
 });
 
 SOCKET.on('move', function(data) {
-  moved = true;
   console.log('Aggiorno le posizioni');
   for (var a = 0; a < data.length; a++) {
     for (var i = 0; i < players.length; i++) {
