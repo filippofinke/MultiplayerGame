@@ -10,8 +10,8 @@ const IMAGE = 'img/' + IMAGES[getRandomNumber(0,IMAGES.length)];
 let GAME = '';
 const GAME_X = 500;
 const GAME_Y = 500;
-const PLAYER_HEIGHT = 100;
-const PLAYER_WIDTH = 100;
+const PLAYER_HEIGHT = 75;
+const PLAYER_WIDTH = 75;
 const SPEED = 10;
 var NAME = '';
 var players = [];
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function(event) {
 function spawnPlayer() {
   NAME = SOCKET.id;
   player = document.createElement('img');
-  player.src = IMAGE;
+  player.src = getImage(IMAGE, direction);
   player.alt = NAME;
   player.width = PLAYER_WIDTH;
   player.height = PLAYER_HEIGHT;
@@ -42,9 +42,9 @@ function spawnPlayer() {
   SOCKET.emit('new', position);
 }
 
-function createPlayer(name, x, y, image) {
+function createPlayer(name, x, y, image, direction) {
   var newplayer = document.createElement('img');
-  newplayer.src = image;
+  newplayer.src = getImage(image, direction);
   newplayer.alt = name;
   newplayer.width = PLAYER_WIDTH;
   newplayer.height = PLAYER_HEIGHT;
@@ -69,36 +69,36 @@ function move() {
   switch (key) {
 
     case 'KeyW':
-      position.Y -= SPEED;
-      direction = 'FORWARD';
+    position.Y -= SPEED;
+    direction = 'FORWARD';
     break;
 
     case 'KeyA':
-      position.X -= SPEED;
-      direction = 'LEFT';
+    position.X -= SPEED;
+    direction = 'LEFT';
     break;
 
     case 'KeyS':
-      position.Y += SPEED;
-      direction = 'BACK';
+    position.Y += SPEED;
+    direction = 'BACK';
     break;
 
     case 'KeyD':
-      position.X += SPEED;
-      direction = 'RIGHT';
+    position.X += SPEED;
+    direction = 'RIGHT';
     break;
 
     default:
-      return;
+    return;
 
   }
 
-  if (position.X < 0) {
-    position.X = 0;
+  if (position.X < 20) {
+    position.X = 20;
   } else if (position.X > GAME_X - PLAYER_WIDTH) {
     position.X = GAME_X - PLAYER_WIDTH;
-  } else if (position.Y < 0) {
-    position.Y = 0;
+  } else if (position.Y < 20) {
+    position.Y = 20;
   } else if (position.Y > GAME_Y - PLAYER_HEIGHT) {
     position.Y = GAME_Y  - PLAYER_HEIGHT;
   }
@@ -114,7 +114,7 @@ SOCKET.on('new', function(data) {
   for (var i = 0; i < data.length; i++) {
     var p = '';
     if (data[i].name != NAME) {
-      p = createPlayer(data[i].name, data[i].x, data[i].y,data[i].image);
+      p = createPlayer(data[i].name, data[i].x, data[i].y,data[i].image, data.direction);
     } else {
       p = player;
     }
@@ -124,7 +124,7 @@ SOCKET.on('new', function(data) {
 
 SOCKET.on('update', function(data) {
   console.log('Nuovo giocatore connesso');
-  var p = createPlayer(data.name, data.x, data.y,data.image);
+  var p = createPlayer(data.name, data.x, data.y,data.image, data.direction);
   players.push({element: p, name: data.name, x: data.x, y: data.y, direction: data.direction, image: data.image});
 });
 
@@ -136,6 +136,7 @@ SOCKET.on('move', function(data) {
         players[i].x = data[a].x;
         players[i].y = data[a].y;
         players[i].direction = data[a].direction;
+        players[i].element.src = getImage(data[a].image, data[a].direction);
         continue;
       }
       if (data[a].name == players[i].name) {
@@ -144,6 +145,7 @@ SOCKET.on('move', function(data) {
         players[i].x = data[a].x;
         players[i].y = data[a].y;
         players[i].direction = data[a].direction;
+        players[i].element.src = getImage(data[a].image, data[a].direction);
         break;
       }
     }
@@ -178,4 +180,15 @@ function removeArray(name, array) {
 
 function moveInterval(event) {
   lastKey = event.code;
+}
+
+function getImage(image, dir)
+{
+  dir = direction.toLowerCase();
+  if(dir == "forward" || dir == "back")
+  {
+    dir = "right";
+  }
+  var temp = image.split("/");
+  return temp[0] + "/" + dir + temp[1];
 }

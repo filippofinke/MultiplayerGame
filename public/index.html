@@ -1,34 +1,15 @@
 <!DOCTYPE html>
 <html>
-   <head>
-      <title>MultiplayerGame</title>
-      <script src="/socket.io/socket.io.js"></script>
-      <script src="client.js"></script>
-   </head>
-   <style>
-   img {
-     position: absolute;
-   }
-   #game {
-     width: 500px;
-     height: 500px;
-     border: 2px solid black;
-   }
-   #logbox {
-     margin-top: 10px;
-     border: 2px solid black;
-     width: 460px;
-     height: 200px;
-     padding: 20px;
-     font-family: monospace;
-     word-wrap: break-word;
-     overflow-y: auto;
-   }
-   </style>
-   <body onkeypress="moveInterval(event)" onload="spawnPlayer()">
-     <div id="game">
-     </div>
-     <div id="logbox">
-     </div>
-   </body>
+<head>
+  <title>MultiplayerGame</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="client.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+</head>
+<body onkeypress="moveInterval(event)" onload="spawnPlayer()">
+  <div id="game">
+  </div>
+  <div id="logbox">
+  </div>
+</body>
 </html>
