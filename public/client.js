@@ -42,9 +42,9 @@ function spawnPlayer() {
   SOCKET.emit('new', position);
 }
 
-function createPlayer(name, x, y, image, direction) {
+function createPlayer(name, x, y, img, dir) {
   var newplayer = document.createElement('img');
-  newplayer.src = getImage(image, direction);
+  newplayer.src = getImage(img, dir);
   newplayer.alt = name;
   newplayer.width = PLAYER_WIDTH;
   newplayer.height = PLAYER_HEIGHT;
@@ -105,6 +105,8 @@ function move() {
 
   player.style.top = '' + position.Y + 'px';
   player.style.left = '' + position.X + 'px';
+  player.src = getImage(IMAGE, direction);
+
   console.log('Mando la mia posizione');
   SOCKET.emit('move', position);
 }
@@ -114,7 +116,7 @@ SOCKET.on('new', function(data) {
   for (var i = 0; i < data.length; i++) {
     var p = '';
     if (data[i].name != NAME) {
-      p = createPlayer(data[i].name, data[i].x, data[i].y,data[i].image, data.direction);
+      p = createPlayer(data[i].name, data[i].x, data[i].y,data[i].image, data[i].direction);
     } else {
       p = player;
     }
@@ -136,8 +138,7 @@ SOCKET.on('move', function(data) {
         players[i].x = data[a].x;
         players[i].y = data[a].y;
         players[i].direction = data[a].direction;
-        players[i].element.src = getImage(data[a].image, data[a].direction);
-        continue;
+        break;
       }
       if (data[a].name == players[i].name) {
         players[i].element.style.top = Number(data[a].y) + 'px';
@@ -182,13 +183,13 @@ function moveInterval(event) {
   lastKey = event.code;
 }
 
-function getImage(image, dir)
+function getImage(img, dir)
 {
-  dir = direction.toLowerCase();
+  dir = dir.toLowerCase();
   if(dir == "forward" || dir == "back")
   {
     dir = "right";
   }
-  var temp = image.split("/");
+  var temp = img.split("/");
   return temp[0] + "/" + dir + temp[1];
 }
