@@ -1,8 +1,3 @@
-const DEBUG = false;
-if (!DEBUG) {
-  console.log = function() {};
-}
-
 const SOCKET = io();
 const IMAGE = 'img/player.png';
 let GAME = '';
@@ -15,7 +10,6 @@ var NAME = '';
 var players = [];
 var player = '';
 var direction = 'FORWARD';
-var moved = true;
 
 document.addEventListener('DOMContentLoaded', function(event) {
   GAME = document.getElementById('game');
@@ -56,9 +50,6 @@ function getRandomNumber(min, max) {
 }
 
 function move(event) {
-  if (!moved) {
-    return;
-  }
   var key = event.code;
   var position = {
     X: Number(player.style.left.replace('px', '')),
@@ -69,24 +60,27 @@ function move(event) {
   switch (key) {
 
     case 'KeyW':
-    position.Y -= SPEED;
-    direction = 'FORWARD';
+      position.Y -= SPEED;
+      direction = 'FORWARD';
     break;
 
     case 'KeyA':
-    position.X -= SPEED;
-    direction = 'LEFT';
+      position.X -= SPEED;
+      direction = 'LEFT';
     break;
 
     case 'KeyS':
-    position.Y += SPEED;
-    direction = 'BACK';
+      position.Y += SPEED;
+      direction = 'BACK';
     break;
 
     case 'KeyD':
-    position.X += SPEED;
-    direction = 'RIGHT';
+      position.X += SPEED;
+      direction = 'RIGHT';
     break;
+
+    default:
+      return;
 
   }
 
@@ -99,9 +93,9 @@ function move(event) {
   } else if (position.Y > GAME_Y - PLAYER_HEIGHT) {
     position.Y = GAME_Y  - PLAYER_HEIGHT;
   }
-  
-  player.style.top = "" + position.Y + 'px';
-  player.style.left = "" + position.X + 'px';
+
+  player.style.top = '' + position.Y + 'px';
+  player.style.left = '' + position.X + 'px';
   console.log('Mando la mia posizione');
   SOCKET.emit('move', position);
 }
@@ -126,7 +120,6 @@ SOCKET.on('update', function(data) {
 });
 
 SOCKET.on('move', function(data) {
-  moved = true;
   console.log('Aggiorno le posizioni');
   for (var a = 0; a < data.length; a++) {
     for (var i = 0; i < players.length; i++) {
@@ -159,6 +152,10 @@ SOCKET.on('quit', function(data) {
   }
 });
 
+SOCKET.on('log', function(data) {
+  document.getElementById('logbox').innerHTML = data.message + '<br>' + document.getElementById('logbox').innerHTML;
+});
+
 SOCKET.on('disconnect', function() {
   document.write('Connessione con il server persa!');
 });
@@ -168,4 +165,15 @@ function removeArray(name, array) {
   if (index > -1) {
     array.splice(index, 1);
   }
+}
+
+var moveint = '';
+function moveInterval(event) {
+  if (!moveint) {
+    moveint = setInterval(function() { move(event); }, 50);
+  }
+}
+function clearMove() {
+  clearInterval(moveint);
+  moveint = false;
 }
