@@ -10,7 +10,8 @@ var NAME = '';
 var players = [];
 var player = '';
 var direction = 'FORWARD';
-
+var lastKey = '';
+setInterval(move, 50);
 document.addEventListener('DOMContentLoaded', function(event) {
   GAME = document.getElementById('game');
 });
@@ -49,8 +50,8 @@ function getRandomNumber(min, max) {
   return Math.floor(Math.random() * max) + min;
 }
 
-function move(event) {
-  var key = event.code;
+function move() {
+  var key = lastKey;
   var position = {
     X: Number(player.style.left.replace('px', '')),
     Y: Number(player.style.top.replace('px', '')),
@@ -167,13 +168,6 @@ function removeArray(name, array) {
   }
 }
 
-var moveint = '';
 function moveInterval(event) {
-  if (!moveint) {
-    moveint = setInterval(function() { move(event); }, 50);
-  }
-}
-function clearMove() {
-  clearInterval(moveint);
-  moveint = false;
+  lastKey = event.code;
 }
