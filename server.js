@@ -38,19 +38,37 @@ function getPlayers() {
   return players;
 }
 
+function existPlayer(name)
+{
+  for(var i = 0; i < players.length; i++)
+  {
+    if(players[i].name == name)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
 io.on('connection', function(socket) {
   var player = '';
   console.log('[Info] Nuovo utente collegato ' + socket.id);
   io.sockets.emit('log', {message:'[Info] Nuovo utente collegato ' + socket.id + "!"});
 
   socket.on('new', function(data) {
-    console.log('[Info] Nuovo giocatore creato!');
-    io.sockets.emit('log', {message:'[Info] Nuovo giocatore creato ' + socket.id + "!"});
-
-    player = new Player(socket.id, data.X, data.Y, data.DIRECTION, data.IMAGE, data.IMAGE.replace("img/","").replace(".png",""));
-    addPlayer(player);
-    socket.emit('new', getPlayers());
-    socket.broadcast.emit('update', player);
+    if(existPlayer(socket.id))
+    {
+      console.log("[Info] Giocatore duplicato, lo disconnetto!");
+      socket.disconnect(true);
+    }
+    else {
+      player = new Player(socket.id, data.X, data.Y, data.DIRECTION, data.IMAGE, data.IMAGE.replace("img/","").replace(".png",""));
+      console.log('[Info] Nuovo giocatore creato!');
+      io.sockets.emit('log', {message:'[Info] Nuovo giocatore creato ' + socket.id + "!"});
+      addPlayer(player);
+      socket.emit('new', getPlayers());
+      socket.broadcast.emit('update', player);
+    }
   });
 
   socket.on('move', function(data) {

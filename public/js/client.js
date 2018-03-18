@@ -1,4 +1,4 @@
-let DEBUG = true;
+let DEBUG = false;
 if(!DEBUG)
 {
   console.log = function(){};
@@ -200,7 +200,7 @@ SOCKET.on('log', function(data) {
 });
 
 SOCKET.on('disconnect', function() {
-  alert("Connessione con il server persa!");
+  logBox("[Errore] Connessione con il server persa!");
 });
 
 function removeArray(name, array) {
@@ -225,4 +225,9 @@ function displayCounter()
 {
   document.getElementById('logbox').innerHTML = "[Info] Zombie: " + zombie_count + " Umani: " + players_count + '<br>' + document.getElementById('logbox').innerHTML;
 
+}
+
+function logBox(text)
+{
+  document.getElementById('logbox').innerHTML = text + '<br>' + document.getElementById('logbox').innerHTML;
 }
