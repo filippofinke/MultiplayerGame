@@ -2,8 +2,8 @@ img {
   position: absolute;
 }
 #game {
-  width: 500px;
-  height: 500px;
+  width: 1000px;
+  height: 600px;
   border: 2px solid black;
   border-radius: 5px;
   background-image: url("../img/background.png");
@@ -11,7 +11,7 @@ img {
 #logbox {
   margin-top: 10px;
   border: 2px solid black;
-  width: 460px;
+  width: 960px;
   height: 200px;
   padding: 20px;
   font-family: monospace;

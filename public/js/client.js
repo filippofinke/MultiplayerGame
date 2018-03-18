@@ -8,8 +8,8 @@ const IMAGES = ['player.png','zombie.png'];
 const SOCKET = io();
 const IMAGE = 'img/' + IMAGES[getRandomNumber(0,IMAGES.length)];
 let GAME = '';
-const GAME_X = 500;
-const GAME_Y = 500;
+let GAME_X;
+let GAME_Y;
 const PLAYER_HEIGHT = 75;
 const PLAYER_WIDTH = 75;
 const SPEED = 5;
@@ -18,10 +18,13 @@ var players = [];
 var player = '';
 var direction = 'FORWARD';
 var lastKey = '';
-setInterval(move, 20);
-document.addEventListener('DOMContentLoaded', function(event) {
+setTimeout(function(){
   GAME = document.getElementById('game');
-});
+  GAME_X = Number(window.getComputedStyle(GAME).getPropertyValue('width').replace("px",""));
+  GAME_Y = Number(window.getComputedStyle(GAME).getPropertyValue('height').replace("px",""));
+  spawnPlayer();
+  setInterval(move, 20);
+}, 100);
 
 function spawnPlayer() {
   NAME = SOCKET.id;
