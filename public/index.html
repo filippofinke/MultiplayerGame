@@ -25,7 +25,7 @@
      overflow-y: auto;
    }
    </style>
-   <body onkeydown="move(event)" onload="spawnPlayer()">
+   <body onkeydown="moveInterval(event)" onkeyup="clearMove()" onload="spawnPlayer()">
      <div id="game">
      </div>
      <div id="logbox">
