@@ -22,13 +22,13 @@ var lastKey = '';
 var zombie_count = 0;
 var players_count = 0;
 
-document.addEventListener("DOMContentLoaded", function(event) {
+setTimeout(function(){
   GAME = document.getElementById('game');
   GAME_X = Number(window.getComputedStyle(GAME).getPropertyValue('width').replace("px",""));
   GAME_Y = Number(window.getComputedStyle(GAME).getPropertyValue('height').replace("px",""));
   spawnPlayer();
   setInterval(move, 20);
-});
+}, 500);
 
 function spawnPlayer() {
   NAME = SOCKET.id;
