@@ -14,9 +14,21 @@
      height: 500px;
      border: 2px solid black;
    }
+   #logbox {
+     margin-top: 10px;
+     border: 2px solid black;
+     width: 460px;
+     height: 200px;
+     padding: 20px;
+     font-family: monospace;
+     word-wrap: break-word;
+     overflow-y: auto;
+   }
    </style>
    <body onkeydown="move(event)" onload="spawnPlayer()">
      <div id="game">
+     </div>
+     <div id="logbox">
      </div>
    </body>
 </html>

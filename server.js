@@ -39,8 +39,12 @@ function getPlayers() {
 io.on('connection', function(socket) {
   var player = '';
   console.log('[Info] Nuovo utente collegato ' + socket.id);
+  io.sockets.emit('log', {message:'[Info] Nuovo utente collegato ' + socket.id + "!"});
+
   socket.on('new', function(data) {
     console.log('[Info] Nuovo giocatore creato!');
+    io.sockets.emit('log', {message:'[Info] Nuovo giocatore creato ' + socket.id + "!"});
+
     player = new Player(socket.id, data.X, data.Y, data.DIRECTION);
     addPlayer(player);
     socket.emit('new', getPlayers());
@@ -56,6 +60,7 @@ io.on('connection', function(socket) {
 
   socket.on('disconnect', function(reason) {
     console.log('[Info] Utente disconnesso ' + socket.id);
+    io.sockets.emit('log', {message:'[Info] Utente disconnesso ' + socket.id});
     socket.broadcast.emit('quit', player);
     removePlayer(player);
   });

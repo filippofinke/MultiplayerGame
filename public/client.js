@@ -99,7 +99,7 @@ function move(event) {
   } else if (position.Y > GAME_Y - PLAYER_HEIGHT) {
     position.Y = GAME_Y  - PLAYER_HEIGHT;
   }
-  
+
   player.style.top = "" + position.Y + 'px';
   player.style.left = "" + position.X + 'px';
   console.log('Mando la mia posizione');
@@ -157,6 +157,10 @@ SOCKET.on('quit', function(data) {
       break;
     }
   }
+});
+
+SOCKET.on('log', function(data){
+  document.getElementById("logbox").innerHTML = data.message + "<br>" +document.getElementById("logbox").innerHTML;
 });
 
 SOCKET.on('disconnect', function() {
