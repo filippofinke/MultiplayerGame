@@ -13,11 +13,12 @@ http.listen(80, function() {
 var players = [];
 
 var Player = class Player {
-  constructor(name, x, y, direction) {
+  constructor(name, x, y, direction, image) {
     this.x = x;
     this.y = y;
     this.direction = direction;
     this.name = name;
+    this.image = image;
   }
 };
 
@@ -45,7 +46,7 @@ io.on('connection', function(socket) {
     console.log('[Info] Nuovo giocatore creato!');
     io.sockets.emit('log', {message:'[Info] Nuovo giocatore creato ' + socket.id + "!"});
 
-    player = new Player(socket.id, data.X, data.Y, data.DIRECTION);
+    player = new Player(socket.id, data.X, data.Y, data.DIRECTION, data.IMAGE);
     addPlayer(player);
     socket.emit('new', getPlayers());
     socket.broadcast.emit('update', player);
