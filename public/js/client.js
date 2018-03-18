@@ -28,7 +28,7 @@ setTimeout(function(){
   GAME_Y = Number(window.getComputedStyle(GAME).getPropertyValue('height').replace("px",""));
   spawnPlayer();
   setInterval(move, 20);
-}, 100);
+}, 300);
 
 function spawnPlayer() {
   NAME = SOCKET.id;
