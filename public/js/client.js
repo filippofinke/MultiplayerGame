@@ -1,4 +1,4 @@
-const DEBUG = false;
+let DEBUG = true;
 if(!DEBUG)
 {
   console.log = function(){};
@@ -18,6 +18,10 @@ var players = [];
 var player = '';
 var direction = 'FORWARD';
 var lastKey = '';
+
+var zombie_count = 0;
+var players_count = 0;
+
 setTimeout(function(){
   GAME = document.getElementById('game');
   GAME_X = Number(window.getComputedStyle(GAME).getPropertyValue('width').replace("px",""));
@@ -123,18 +127,33 @@ SOCKET.on('new', function(data) {
     } else {
       p = player;
     }
-    players.push({element: p, name: data[i].name, x: data[i].x, y: data[i].y, direction: data[i].direction, image: data[i].image});
+    if(data[i].type == "zombie")
+    {
+      zombie_count += 1;
+    }
+    else {
+      players_count += 1;
+    }
+    players.push({element: p, name: data[i].name, type: data[i].type, x: data[i].x, y: data[i].y, direction: data[i].direction, image: data[i].image});
   }
+  displayCounter();
 });
 
 SOCKET.on('update', function(data) {
   console.log('Nuovo giocatore connesso');
   var p = createPlayer(data.name, data.x, data.y,data.image, data.direction);
-  players.push({element: p, name: data.name, x: data.x, y: data.y, direction: data.direction, image: data.image});
+  players.push({element: p, name: data.name, type: data.type, x: data.x, y: data.y, direction: data.direction, image: data.image});
+  if(data.type == "zombie")
+  {
+    zombie_count += 1;
+  }
+  else {
+    players_count += 1;
+  }
+  displayCounter();
 });
 
 SOCKET.on('move', function(data) {
-  console.log('Aggiorno le posizioni');
   for (var a = 0; a < data.length; a++) {
     for (var i = 0; i < players.length; i++) {
       if (data[a].name == NAME) {
@@ -160,11 +179,20 @@ SOCKET.on('quit', function(data) {
   console.log('Un utente si è disconnesso');
   for (var i = 0; i < players.length; i++) {
     if (players[i].name == data.name) {
+      if(players[i].type == "zombie")
+      {
+        zombie_count -= 1;
+      }
+      else
+      {
+        players_count -= 1;
+      }
       players[i].element.remove();
       removeArray(players[i], players);
       break;
     }
   }
+  displayCounter();
 });
 
 SOCKET.on('log', function(data) {
@@ -191,4 +219,10 @@ function getImage(img, dir)
   dir = dir.toLowerCase();
   var temp = img.split("/");
   return temp[0] + "/" + dir + temp[1];
+}
+
+function displayCounter()
+{
+  document.getElementById('logbox').innerHTML = "[Info] Zombie: " + zombie_count + " Umani: " + players_count + '<br>' + document.getElementById('logbox').innerHTML;
+
 }
