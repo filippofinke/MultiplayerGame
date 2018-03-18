@@ -1,5 +1,12 @@
+const DEBUG = false;
+if(!DEBUG)
+{
+  console.log = function(){};
+}
+
+const IMAGES = ['player.png','zombie.png'];
 const SOCKET = io();
-const IMAGE = 'img/player.png';
+const IMAGE = 'img/' + IMAGES[getRandomNumber(0,IMAGES.length)];
 let GAME = '';
 const GAME_X = 500;
 const GAME_Y = 500;
@@ -28,15 +35,16 @@ function spawnPlayer() {
   var position = {
     X: Number(player.style.left.replace('px', '')),
     Y: Number(player.style.top.replace('px', '')),
-    DIRECTION: direction
+    DIRECTION: direction,
+    IMAGE: IMAGE
   };
   GAME.appendChild(player);
   SOCKET.emit('new', position);
 }
 
-function createPlayer(name, x, y) {
+function createPlayer(name, x, y, image) {
   var newplayer = document.createElement('img');
-  newplayer.src = IMAGE;
+  newplayer.src = image;
   newplayer.alt = name;
   newplayer.width = PLAYER_WIDTH;
   newplayer.height = PLAYER_HEIGHT;
@@ -106,18 +114,18 @@ SOCKET.on('new', function(data) {
   for (var i = 0; i < data.length; i++) {
     var p = '';
     if (data[i].name != NAME) {
-      p = createPlayer(data[i].name, data[i].x, data[i].y);
+      p = createPlayer(data[i].name, data[i].x, data[i].y,data[i].image);
     } else {
       p = player;
     }
-    players.push({element: p, name: data[i].name, x: data[i].x, y: data[i].y, direction: data[i].direction});
+    players.push({element: p, name: data[i].name, x: data[i].x, y: data[i].y, direction: data[i].direction, image: data[i].image});
   }
 });
 
 SOCKET.on('update', function(data) {
   console.log('Nuovo giocatore connesso');
-  var p = createPlayer(data.name, data.x, data.y);
-  players.push({element: p, name: data.name, x: data.x, y: data.y, direction: data.direction});
+  var p = createPlayer(data.name, data.x, data.y,data.image);
+  players.push({element: p, name: data.name, x: data.x, y: data.y, direction: data.direction, image: data.image});
 });
 
 SOCKET.on('move', function(data) {
