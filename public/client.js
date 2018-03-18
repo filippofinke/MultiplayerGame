@@ -186,7 +186,7 @@ function moveInterval(event) {
 function getImage(img, dir)
 {
   dir = dir.toLowerCase();
-  if(dir == "forward" || dir == "back")
+  if(dir == "back")
   {
     dir = "right";
   }
