@@ -76,28 +76,26 @@ function move() {
   switch (key) {
 
     case 'KeyW':
-    position.Y -= SPEED;
-    direction = 'FORWARD';
-    break;
+      position.Y -= SPEED;
+      direction = 'FORWARD';
+      break;
 
     case 'KeyA':
-    position.X -= SPEED;
-    direction = 'LEFT';
-    break;
+      position.X -= SPEED;
+      direction = 'LEFT';
+      break;
 
     case 'KeyS':
-    position.Y += SPEED;
-    direction = 'BACK';
-    break;
+      position.Y += SPEED;
+      direction = 'BACK';
+      break;
 
     case 'KeyD':
-    position.X += SPEED;
-    direction = 'RIGHT';
-    break;
-
+      position.X += SPEED;
+      direction = 'RIGHT';
+      break;
     default:
-    return;
-
+      return;
   }
 
   if (position.X < 20) {
