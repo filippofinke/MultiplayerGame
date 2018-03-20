@@ -296,6 +296,13 @@ SOCKET.on('disconnect', function() {
   logBox("[Errore] Connessione con il server persa!");
 });
 
+SOCKET.on('reconnect', function() {
+  logBox("[Errore] Il server ha chiesto di ricollegarsi!");
+  setTimeout(function(){
+    location.reload();
+  },500);
+});
+
 function removeArray(name, array) {
   var index = array.indexOf(name);
   if (index > -1) {

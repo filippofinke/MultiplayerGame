@@ -50,9 +50,17 @@ function existPlayer(name)
   return false;
 }
 
+function reconnect(socket)
+{
+  console.log("[Errore] Utente già collegato ma non spawnato, faccio ricollegare!");
+  socket.emit('reconnect',{message:"Errore, ricollegarsi!"});
+  socket.disconnect(true);
+}
+
 io.on('connection', function(socket) {
   var player = '';
   var last_shot = 0;
+  var spawned = false;
   console.log('[Info] Nuovo utente collegato ' + socket.id);
   io.sockets.emit('log', {message:'[Info] Nuovo utente collegato ' + socket.id + "!"});
 
@@ -69,10 +77,15 @@ io.on('connection', function(socket) {
       addPlayer(player);
       socket.emit('new', getPlayers());
       socket.broadcast.emit('update', player);
+      spawned = true;
     }
   });
 
   socket.on('move', function(data) {
+    if(!spawned)
+    {
+      reconnect(socket);
+    }
     player.x = data.X;
     player.y = data.Y;
     player.direction = data.DIRECTION;
@@ -80,6 +93,10 @@ io.on('connection', function(socket) {
   });
 
   socket.on('disconnect', function(reason) {
+    if(!spawned)
+    {
+      reconnect(socket);
+    }
     console.log('[Info] Utente disconnesso ' + socket.id);
     io.sockets.emit('log', {message:'[Info] Utente disconnesso ' + socket.id});
     socket.broadcast.emit('quit', player);
@@ -87,6 +104,10 @@ io.on('connection', function(socket) {
   });
 
   socket.on('newbullet', function(data){
+    if(!spawned)
+    {
+      reconnect(socket);
+    }
     var current = new Date().getTime();
     if(current - last_shot >= 250)
     {
