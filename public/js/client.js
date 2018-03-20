@@ -98,7 +98,7 @@ function move() {
     direction = 'RIGHT';
     break;
     default:
-    return;
+    break;
   }
 
   if (position.X < 20) {
@@ -180,18 +180,19 @@ function moveBullet(e, dir, blife, owner)
     e.style.top = y + BULLET_SPEED + "px";
   }
 
-  for(var i = 0; i < players.length; i++)
+  for(var a = 0; a < players.length; a++)
   {
-    var min_x = players[i].x;
-    var min_y = players[i].y;
+    var min_x = Number(players[a].element.style.left.replace("px",""));
+    players[a].x = min_x;
+    var min_y = Number(players[a].element.style.top.replace("px",""));
+    players[a].x = min_y;
     var max_x = min_x + PLAYER_WIDTH;
     var max_y = min_y + PLAYER_HEIGHT;
     if(x>= min_x && x <= max_x && y >= min_y && y <= max_y)
     {
-      if(players[i].name != owner)
+      if(players[a].name != owner)
       {
-        console.log("Era di " + owner);
-        console.log("Colpito " + players[i].name);
+        console.log("Era di " + owner + " Colpito: "+ players[a].name);
         deleteBullet(e, blife);
         break;
       }
@@ -264,16 +265,14 @@ SOCKET.on('move', function(data) {
         players[i].x = data[a].x;
         players[i].y = data[a].y;
         players[i].direction = data[a].direction;
-        break;
       }
-      if (data[a].name == players[i].name) {
+      else if (data[a].name == players[i].name) {
         players[i].element.style.top = Number(data[a].y) + 'px';
         players[i].element.style.left = Number(data[a].x) + 'px';
-        players[i].x = data[a].x;
-        players[i].y = data[a].y;
+        players[i].x = Number(data[a].x);
+        players[i].y = Number(data[a].y);
         players[i].direction = data[a].direction;
         players[i].element.src = getImage(data[a].image, data[a].direction);
-        break;
       }
     }
   }
