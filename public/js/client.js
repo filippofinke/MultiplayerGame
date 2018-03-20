@@ -18,6 +18,7 @@ const PLAYER_SPEED = 5;
 const BULLET_SPEED = 10;
 const BULLET_IMAGE = 'img/arrow.png';
 var NAME = '';
+var TYPE = '';
 var players = [];
 var player = '';
 var direction = 'FORWARD';
@@ -59,6 +60,7 @@ function createPlayer(name, x, y, img, dir) {
   playercont.appendChild(newplayer);
   playercont.style.left = x + 'px';
   playercont.style.top = y + 'px';
+  playercont.innerHTML += "<p class='health'>100%</p>";
   GAME.appendChild(playercont);
   return playercont;
 }
@@ -124,6 +126,7 @@ function shot()
   var dir = direction;
   var data = {
     OWNER: NAME,
+    SQUAD: TYPE,
     X: x,
     Y: y,
     DIRECTION: dir
@@ -137,7 +140,7 @@ function deleteBullet(element, blife)
   element.remove();
 }
 
-function moveBullet(e, dir, blife, owner)
+function moveBullet(e, dir, blife, owner, squad)
 {
   var x =  Number(e.style.left.replace('px', ''));
   var y =  Number(e.style.top.replace('px', ''));
@@ -176,7 +179,7 @@ function moveBullet(e, dir, blife, owner)
     var max_y = min_y + PLAYER_HEIGHT;
     if(x>= min_x && x <= max_x && y >= min_y && y <= max_y || x + BULLET_WIDTH>= min_x && x + BULLET_WIDTH <= max_x && y + BULLET_HEIGHT >= min_y && y + BULLET_HEIGHT <= max_y)
     {
-      if(players[a].name != owner)
+      if(players[a].name != owner && players[a].type != squad )
       {
         console.log("Era di " + owner + " Colpito: "+ players[a].name);
         deleteBullet(e, blife);
@@ -187,7 +190,7 @@ function moveBullet(e, dir, blife, owner)
   }
 }
 
-function spawnCustomBullet(owner, x, y, dir)
+function spawnCustomBullet(owner, x, y, dir, squad)
 {
   console.log("Creato nuovo sparo verso " + direction + " di " + owner + "!");
   var bullet = document.createElement("img");
@@ -199,7 +202,7 @@ function spawnCustomBullet(owner, x, y, dir)
   GAME.appendChild(bullet);
 
   var blife = setInterval(function(){
-    moveBullet(bullet, dir, blife,owner);
+    moveBullet(bullet, dir, blife,owner, squad);
   },20);
   setTimeout(function(){
     deleteBullet(bullet,blife);
@@ -208,7 +211,7 @@ function spawnCustomBullet(owner, x, y, dir)
 
 SOCKET.on('bullet', function(data)
 {
-  spawnCustomBullet(data.OWNER, data.X, data.Y, data.DIRECTION);
+  spawnCustomBullet(data.OWNER, data.X, data.Y, data.DIRECTION, data.SQUAD);
 });
 
 SOCKET.on('new', function(data) {
@@ -219,6 +222,7 @@ SOCKET.on('new', function(data) {
       p = createPlayer(data[i].name, data[i].x, data[i].y,data[i].image, data[i].direction);
     } else {
       p = player;
+      TYPE = data[i].type;
     }
     if(data[i].type == "zombie")
     {
