@@ -52,6 +52,7 @@ function existPlayer(name)
 
 io.on('connection', function(socket) {
   var player = '';
+  var last_shot = 0;
   console.log('[Info] Nuovo utente collegato ' + socket.id);
   io.sockets.emit('log', {message:'[Info] Nuovo utente collegato ' + socket.id + "!"});
 
@@ -86,7 +87,12 @@ io.on('connection', function(socket) {
   });
 
   socket.on('newbullet', function(data){
-    console.log('[Info] Nuovo sparo da parte di ' + socket.id + '!');
-    socket.broadcast.emit('bullet', data);
+    var current = new Date().getTime();
+    if(current - last_shot >= 250)
+    {
+      last_shot = current;
+      console.log('[Info] Nuovo sparo da parte di ' + socket.id + '!');
+      io.sockets.emit('bullet', data);
+    }
   });
 });

@@ -16,6 +16,7 @@ const BULLET_HEIGHT = 25;
 const BULLET_WIDTH = 25;
 const PLAYER_SPEED = 5;
 const BULLET_SPEED = 10;
+const BULLET_IMAGE = 'img/bullet.png';
 var NAME = '';
 var players = [];
 var player = '';
@@ -122,13 +123,6 @@ function shot()
   console.log("Sparo verso: " + direction);
   var x =  Number(player.style.left.replace('px', ''));
   var y =  Number(player.style.top.replace('px', ''));
-  var bullet = document.createElement("span");
-  bullet.style.width = BULLET_WIDTH + "px";
-  bullet.style.height = BULLET_HEIGHT  + "px";
-  bullet.style.left = (x + PLAYER_WIDTH/2 - BULLET_WIDTH/2) + "px";
-  bullet.style.top = (y + PLAYER_HEIGHT/2 - BULLET_HEIGHT/2) + "px";
-  GAME.appendChild(bullet);
-
   var dir = direction;
   var data = {
     OWNER: NAME,
@@ -137,12 +131,6 @@ function shot()
     DIRECTION: dir
   }
   SOCKET.emit('newbullet', data);
-  var blife = setInterval(function(){
-    moveBullet(bullet, dir, blife, data.OWNER);
-  },20);
-  setTimeout(function(){
-    deleteBullet(bullet,blife);
-  }, 3000);
 }
 
 function deleteBullet(element, blife)
@@ -204,9 +192,10 @@ function moveBullet(e, dir, blife, owner)
 function spawnCustomBullet(owner, x, y, dir)
 {
   console.log("Creato nuovo sparo verso " + direction + " di " + owner + "!");
-  var bullet = document.createElement("span");
+  var bullet = document.createElement("img");
   bullet.style.width = BULLET_WIDTH + "px";
   bullet.style.height = BULLET_HEIGHT  + "px";
+  bullet.src = BULLET_IMAGE;
   bullet.style.left = (x + PLAYER_WIDTH/2 - BULLET_WIDTH/2) + "px";
   bullet.style.top = (y + PLAYER_HEIGHT/2 - BULLET_HEIGHT/2) + "px";
   GAME.appendChild(bullet);

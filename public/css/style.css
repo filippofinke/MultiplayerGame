@@ -2,11 +2,6 @@ img {
   position: absolute;
 }
 
-span {
-  position: absolute;
-  background-color: red;
-}
-
 #game {
   width: 700px;
   height: 600px;
