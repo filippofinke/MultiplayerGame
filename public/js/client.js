@@ -188,12 +188,13 @@ function moveBullet(e, dir, blife, owner)
     players[a].x = min_y;
     var max_x = min_x + PLAYER_WIDTH;
     var max_y = min_y + PLAYER_HEIGHT;
-    if(x>= min_x && x <= max_x && y >= min_y && y <= max_y)
+    if(x>= min_x && x <= max_x && y >= min_y && y <= max_y || x + BULLET_WIDTH>= min_x && x + BULLET_WIDTH <= max_x && y + BULLET_HEIGHT >= min_y && y + BULLET_HEIGHT <= max_y)
     {
       if(players[a].name != owner)
       {
         console.log("Era di " + owner + " Colpito: "+ players[a].name);
         deleteBullet(e, blife);
+        logBox("[Info] " + owner + " ha colpito " + players[a].name + "!");
         break;
       }
     }
