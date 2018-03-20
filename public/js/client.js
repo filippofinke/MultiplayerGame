@@ -34,25 +34,6 @@ setTimeout(function(){
   setInterval(move, 20);
 }, 500);
 
-function spawnPlayere() {
-  NAME = SOCKET.id;
-  player = document.createElement('img');
-  player.src = getImage(IMAGE, direction);
-  player.alt = NAME;
-  player.width = PLAYER_WIDTH;
-  player.height = PLAYER_HEIGHT;
-  player.style.left = getRandomNumber(0, GAME_X - PLAYER_WIDTH) + 'px';
-  player.style.top = getRandomNumber(0, GAME_Y - PLAYER_HEIGHT) + 'px';
-  var position = {
-    X: Number(player.style.left.replace('px', '')),
-    Y: Number(player.style.top.replace('px', '')),
-    DIRECTION: direction,
-    IMAGE: IMAGE
-  };
-  GAME.appendChild(player);
-  SOCKET.emit('new', position);
-}
-
 function spawnPlayer() {
   NAME = SOCKET.id;
   var x = getRandomNumber(0, GAME_X - PLAYER_WIDTH);
