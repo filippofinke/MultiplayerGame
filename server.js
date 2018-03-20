@@ -84,4 +84,9 @@ io.on('connection', function(socket) {
     socket.broadcast.emit('quit', player);
     removePlayer(player);
   });
+
+  socket.on('newbullet', function(data){
+    console.log('[Info] Nuovo sparo da parte di ' + socket.id + '!');
+    socket.broadcast.emit('bullet', data);
+  });
 });

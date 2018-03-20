@@ -1,4 +1,4 @@
-let DEBUG = false;
+let DEBUG = true;
 if(!DEBUG)
 {
   console.log = function(){};
@@ -12,7 +12,10 @@ let GAME_X;
 let GAME_Y;
 const PLAYER_HEIGHT = 75;
 const PLAYER_WIDTH = 75;
-const SPEED = 5;
+const BULLET_HEIGHT = 25;
+const BULLET_WIDTH = 25;
+const PLAYER_SPEED = 5;
+const BULLET_SPEED = 10;
 var NAME = '';
 var players = [];
 var player = '';
@@ -76,26 +79,26 @@ function move() {
   switch (key) {
 
     case 'KeyW':
-      position.Y -= SPEED;
-      direction = 'FORWARD';
-      break;
+    position.Y -= PLAYER_SPEED;
+    direction = 'FORWARD';
+    break;
 
     case 'KeyA':
-      position.X -= SPEED;
-      direction = 'LEFT';
-      break;
+    position.X -= PLAYER_SPEED;
+    direction = 'LEFT';
+    break;
 
     case 'KeyS':
-      position.Y += SPEED;
-      direction = 'BACK';
-      break;
+    position.Y += PLAYER_SPEED;
+    direction = 'BACK';
+    break;
 
     case 'KeyD':
-      position.X += SPEED;
-      direction = 'RIGHT';
-      break;
+    position.X += PLAYER_SPEED;
+    direction = 'RIGHT';
+    break;
     default:
-      return;
+    return;
   }
 
   if (position.X < 20) {
@@ -111,10 +114,113 @@ function move() {
   player.style.top = '' + position.Y + 'px';
   player.style.left = '' + position.X + 'px';
   player.src = getImage(IMAGE, direction);
-
-  console.log('Mando la mia posizione');
   SOCKET.emit('move', position);
 }
+
+function shot()
+{
+  console.log("Sparo verso: " + direction);
+  var x =  Number(player.style.left.replace('px', ''));
+  var y =  Number(player.style.top.replace('px', ''));
+  var bullet = document.createElement("span");
+  bullet.style.width = BULLET_WIDTH + "px";
+  bullet.style.height = BULLET_HEIGHT  + "px";
+  bullet.style.left = (x + PLAYER_WIDTH/2 - BULLET_WIDTH/2) + "px";
+  bullet.style.top = (y + PLAYER_HEIGHT/2 - BULLET_HEIGHT/2) + "px";
+  GAME.appendChild(bullet);
+
+  var dir = direction;
+  var data = {
+    OWNER: NAME,
+    X: x,
+    Y: y,
+    DIRECTION: dir
+  }
+  SOCKET.emit('newbullet', data);
+  var blife = setInterval(function(){
+    moveBullet(bullet, dir, blife, data.OWNER);
+  },20);
+  setTimeout(function(){
+    deleteBullet(bullet,blife);
+  }, 3000);
+}
+
+function deleteBullet(element, blife)
+{
+  clearInterval(blife);
+  element.remove();
+}
+
+function moveBullet(e, dir, blife, owner)
+{
+  var x =  Number(e.style.left.replace('px', ''));
+  var y =  Number(e.style.top.replace('px', ''));
+
+  if (x < 0 ||
+    x > GAME_X ||
+    y < 0 ||
+    y > GAME_Y) {
+      deleteBullet(e, blife);
+  }
+
+  if(dir == 'FORWARD')
+  {
+      e.style.top = y - BULLET_SPEED + "px";
+  }
+  else if(dir == 'LEFT')
+  {
+      e.style.left = x - BULLET_SPEED + "px";
+  }
+  else if(dir == 'RIGHT')
+  {
+      e.style.left = x + BULLET_SPEED + "px";
+  }
+  else if(dir == 'BACK')
+  {
+    e.style.top = y + BULLET_SPEED + "px";
+  }
+
+  for(var i = 0; i < players.length; i++)
+  {
+    var min_x = players[i].x;
+    var min_y = players[i].y;
+    var max_x = min_x + PLAYER_WIDTH;
+    var max_y = min_y + PLAYER_HEIGHT;
+    if(x>= min_x && x <= max_x && y >= min_y && y <= max_y)
+    {
+      if(players[i].name != owner)
+      {
+        console.log("Era di " + owner);
+        console.log("Colpito " + players[i].name);
+        deleteBullet(e, blife);
+        break;
+      }
+    }
+  }
+}
+
+function spawnCustomBullet(owner, x, y, dir)
+{
+  console.log("Creato nuovo sparo verso " + direction + " di " + owner + "!");
+  var bullet = document.createElement("span");
+  bullet.style.width = BULLET_WIDTH + "px";
+  bullet.style.height = BULLET_HEIGHT  + "px";
+  bullet.style.left = (x + PLAYER_WIDTH/2 - BULLET_WIDTH/2) + "px";
+  bullet.style.top = (y + PLAYER_HEIGHT/2 - BULLET_HEIGHT/2) + "px";
+  GAME.appendChild(bullet);
+
+  var blife = setInterval(function(){
+    moveBullet(bullet, dir, blife,owner);
+  },20);
+  setTimeout(function(){
+    deleteBullet(bullet,blife);
+  }, 3000);
+}
+
+SOCKET.on('bullet', function(data)
+{
+  spawnCustomBullet(data.OWNER, data.X, data.Y, data.DIRECTION);
+});
 
 SOCKET.on('new', function(data) {
   console.log('Carico i giocatori');
@@ -209,7 +315,14 @@ function removeArray(name, array) {
 }
 
 function moveInterval(event) {
-  lastKey = event.code;
+  if(event.code == 'Space')
+  {
+    shot();
+  }
+  else
+  {
+    lastKey = event.code;
+  }
 }
 
 function getImage(img, dir)

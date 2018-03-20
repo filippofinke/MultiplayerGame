@@ -1,8 +1,15 @@
 img {
   position: absolute;
+  border: 2px solid orange;
 }
+
+span {
+  position: absolute;
+  background-color: red;
+}
+
 #game {
-  width: 1000px;
+  width: 700px;
   height: 600px;
   border: 2px solid black;
   border-radius: 5px;
@@ -11,7 +18,7 @@ img {
 #logbox {
   margin-top: 10px;
   border: 2px solid black;
-  width: 960px;
+  width: 660px;
   height: 200px;
   padding: 20px;
   font-family: monospace;
