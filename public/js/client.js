@@ -16,8 +16,9 @@ const BULLET_HEIGHT = 25;
 const BULLET_WIDTH = 25;
 const PLAYER_SPEED = 5;
 const BULLET_SPEED = 10;
-const BULLET_IMAGE = 'img/bullet.png';
+const BULLET_IMAGE = 'img/arrow.png';
 var NAME = '';
+var TYPE = '';
 var players = [];
 var player = '';
 var direction = 'FORWARD';
@@ -36,33 +37,32 @@ setTimeout(function(){
 
 function spawnPlayer() {
   NAME = SOCKET.id;
-  player = document.createElement('img');
-  player.src = getImage(IMAGE, direction);
-  player.alt = NAME;
-  player.width = PLAYER_WIDTH;
-  player.height = PLAYER_HEIGHT;
-  player.style.left = getRandomNumber(0, GAME_X - PLAYER_WIDTH) + 'px';
-  player.style.top = getRandomNumber(0, GAME_Y - PLAYER_HEIGHT) + 'px';
+  var x = getRandomNumber(0, GAME_X - PLAYER_WIDTH);
+  var y = getRandomNumber(0, GAME_Y - PLAYER_HEIGHT);
   var position = {
-    X: Number(player.style.left.replace('px', '')),
-    Y: Number(player.style.top.replace('px', '')),
+    X: x,
+    Y: y,
     DIRECTION: direction,
     IMAGE: IMAGE
   };
-  GAME.appendChild(player);
+  player = createPlayer(NAME, x, y, IMAGE, direction);
   SOCKET.emit('new', position);
 }
 
 function createPlayer(name, x, y, img, dir) {
+  var playercont = document.createElement('div');
+  playercont.className += 'player-container';
   var newplayer = document.createElement('img');
   newplayer.src = getImage(img, dir);
   newplayer.alt = name;
   newplayer.width = PLAYER_WIDTH;
   newplayer.height = PLAYER_HEIGHT;
-  newplayer.style.left = x + 'px';
-  newplayer.style.top = y + 'px';
-  GAME.appendChild(newplayer);
-  return newplayer;
+  playercont.appendChild(newplayer);
+  playercont.style.left = x + 'px';
+  playercont.style.top = y + 'px';
+  playercont.innerHTML += "<p class='health'>100%</p>";
+  GAME.appendChild(playercont);
+  return playercont;
 }
 
 function getRandomNumber(min, max) {
@@ -114,7 +114,7 @@ function move() {
 
   player.style.top = '' + position.Y + 'px';
   player.style.left = '' + position.X + 'px';
-  player.src = getImage(IMAGE, direction);
+  player.getElementsByTagName("img")[0].src = getImage(IMAGE, direction);
   SOCKET.emit('move', position);
 }
 
@@ -126,6 +126,7 @@ function shot()
   var dir = direction;
   var data = {
     OWNER: NAME,
+    SQUAD: TYPE,
     X: x,
     Y: y,
     DIRECTION: dir
@@ -139,7 +140,7 @@ function deleteBullet(element, blife)
   element.remove();
 }
 
-function moveBullet(e, dir, blife, owner)
+function moveBullet(e, dir, blife, owner, squad)
 {
   var x =  Number(e.style.left.replace('px', ''));
   var y =  Number(e.style.top.replace('px', ''));
@@ -178,7 +179,7 @@ function moveBullet(e, dir, blife, owner)
     var max_y = min_y + PLAYER_HEIGHT;
     if(x>= min_x && x <= max_x && y >= min_y && y <= max_y || x + BULLET_WIDTH>= min_x && x + BULLET_WIDTH <= max_x && y + BULLET_HEIGHT >= min_y && y + BULLET_HEIGHT <= max_y)
     {
-      if(players[a].name != owner)
+      if(players[a].name != owner && players[a].type != squad )
       {
         console.log("Era di " + owner + " Colpito: "+ players[a].name);
         deleteBullet(e, blife);
@@ -189,19 +190,19 @@ function moveBullet(e, dir, blife, owner)
   }
 }
 
-function spawnCustomBullet(owner, x, y, dir)
+function spawnCustomBullet(owner, x, y, dir, squad)
 {
   console.log("Creato nuovo sparo verso " + direction + " di " + owner + "!");
   var bullet = document.createElement("img");
   bullet.style.width = BULLET_WIDTH + "px";
   bullet.style.height = BULLET_HEIGHT  + "px";
-  bullet.src = BULLET_IMAGE;
+  bullet.src = getImage(BULLET_IMAGE, dir);
   bullet.style.left = (x + PLAYER_WIDTH/2 - BULLET_WIDTH/2) + "px";
   bullet.style.top = (y + PLAYER_HEIGHT/2 - BULLET_HEIGHT/2) + "px";
   GAME.appendChild(bullet);
 
   var blife = setInterval(function(){
-    moveBullet(bullet, dir, blife,owner);
+    moveBullet(bullet, dir, blife,owner, squad);
   },20);
   setTimeout(function(){
     deleteBullet(bullet,blife);
@@ -210,7 +211,7 @@ function spawnCustomBullet(owner, x, y, dir)
 
 SOCKET.on('bullet', function(data)
 {
-  spawnCustomBullet(data.OWNER, data.X, data.Y, data.DIRECTION);
+  spawnCustomBullet(data.OWNER, data.X, data.Y, data.DIRECTION, data.SQUAD);
 });
 
 SOCKET.on('new', function(data) {
@@ -221,6 +222,7 @@ SOCKET.on('new', function(data) {
       p = createPlayer(data[i].name, data[i].x, data[i].y,data[i].image, data[i].direction);
     } else {
       p = player;
+      TYPE = data[i].type;
     }
     if(data[i].type == "zombie")
     {
@@ -262,7 +264,7 @@ SOCKET.on('move', function(data) {
         players[i].x = Number(data[a].x);
         players[i].y = Number(data[a].y);
         players[i].direction = data[a].direction;
-        players[i].element.src = getImage(data[a].image, data[a].direction);
+        players[i].element.getElementsByTagName("img")[0].src = getImage(data[a].image, data[a].direction);
       }
     }
   }

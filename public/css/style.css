@@ -2,6 +2,23 @@ img {
   position: absolute;
 }
 
+.player-container {
+  position: absolute;
+}
+
+.health {
+  position: absolute;
+  bottom: 0px;
+  color: green;
+  font-weight: bold;
+  font-style: monospace;
+  background-color: white;
+  border-radius: 5px;
+  margin: auto;
+  margin-bottom: 4px;
+  margin-left: 18px;
+}
+
 #game {
   width: 700px;
   height: 600px;
