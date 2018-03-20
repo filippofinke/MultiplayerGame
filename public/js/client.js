@@ -34,7 +34,7 @@ setTimeout(function(){
   setInterval(move, 20);
 }, 500);
 
-function spawnPlayer() {
+function spawnPlayere() {
   NAME = SOCKET.id;
   player = document.createElement('img');
   player.src = getImage(IMAGE, direction);
@@ -53,16 +53,33 @@ function spawnPlayer() {
   SOCKET.emit('new', position);
 }
 
+function spawnPlayer() {
+  NAME = SOCKET.id;
+  var x = getRandomNumber(0, GAME_X - PLAYER_WIDTH);
+  var y = getRandomNumber(0, GAME_Y - PLAYER_HEIGHT);
+  var position = {
+    X: x,
+    Y: y,
+    DIRECTION: direction,
+    IMAGE: IMAGE
+  };
+  player = createPlayer(NAME, x, y, IMAGE, direction);
+  SOCKET.emit('new', position);
+}
+
 function createPlayer(name, x, y, img, dir) {
+  var playercont = document.createElement('div');
+  playercont.className += 'player-container';
   var newplayer = document.createElement('img');
   newplayer.src = getImage(img, dir);
   newplayer.alt = name;
   newplayer.width = PLAYER_WIDTH;
   newplayer.height = PLAYER_HEIGHT;
-  newplayer.style.left = x + 'px';
-  newplayer.style.top = y + 'px';
-  GAME.appendChild(newplayer);
-  return newplayer;
+  playercont.appendChild(newplayer);
+  playercont.style.left = x + 'px';
+  playercont.style.top = y + 'px';
+  GAME.appendChild(playercont);
+  return playercont;
 }
 
 function getRandomNumber(min, max) {
@@ -114,7 +131,7 @@ function move() {
 
   player.style.top = '' + position.Y + 'px';
   player.style.left = '' + position.X + 'px';
-  player.src = getImage(IMAGE, direction);
+  player.getElementsByTagName("img")[0].src = getImage(IMAGE, direction);
   SOCKET.emit('move', position);
 }
 
@@ -262,7 +279,7 @@ SOCKET.on('move', function(data) {
         players[i].x = Number(data[a].x);
         players[i].y = Number(data[a].y);
         players[i].direction = data[a].direction;
-        players[i].element.src = getImage(data[a].image, data[a].direction);
+        players[i].element.getElementsByTagName("img")[0].src = getImage(data[a].image, data[a].direction);
       }
     }
   }

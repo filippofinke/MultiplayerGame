@@ -2,6 +2,10 @@ img {
   position: absolute;
 }
 
+.player-container {
+  position: absolute;
+}
+
 #game {
   width: 700px;
   height: 600px;
