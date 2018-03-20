@@ -3,6 +3,7 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 const util = require('util');
+const SHOT_DELAY = 250;
 
 app.use('/', express.static(__dirname + '/public'));
 
@@ -109,7 +110,7 @@ io.on('connection', function(socket) {
       reconnect(socket);
     }
     var current = new Date().getTime();
-    if(current - last_shot >= 250)
+    if(current - last_shot >= SHOT_DELAY)
     {
       last_shot = current;
       console.log('[Info] Nuovo sparo da parte di ' + socket.id + '!');
