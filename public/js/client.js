@@ -16,7 +16,7 @@ const BULLET_HEIGHT = 25;
 const BULLET_WIDTH = 25;
 const PLAYER_SPEED = 5;
 const BULLET_SPEED = 10;
-const BULLET_IMAGE = 'img/bullet.png';
+const BULLET_IMAGE = 'img/arrow.png';
 var NAME = '';
 var players = [];
 var player = '';
@@ -195,7 +195,7 @@ function spawnCustomBullet(owner, x, y, dir)
   var bullet = document.createElement("img");
   bullet.style.width = BULLET_WIDTH + "px";
   bullet.style.height = BULLET_HEIGHT  + "px";
-  bullet.src = BULLET_IMAGE;
+  bullet.src = getImage(BULLET_IMAGE, dir);
   bullet.style.left = (x + PLAYER_WIDTH/2 - BULLET_WIDTH/2) + "px";
   bullet.style.top = (y + PLAYER_HEIGHT/2 - BULLET_HEIGHT/2) + "px";
   GAME.appendChild(bullet);
