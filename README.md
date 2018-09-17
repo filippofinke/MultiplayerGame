@@ -15,6 +15,8 @@
 * Scaricare ed installare nodejs
 * Scaricare il progetto
 	> git clone https://github.com/filippofinke/MultiplayerGame.git
+* Installare le dipendenze
+  > npm install socket.io express --save
 * Aprire un terminale e digitare:
 	> node server.js
 * Recarsi su http://localhost:80
