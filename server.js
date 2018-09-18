@@ -5,10 +5,11 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 const util = require('util');
 const SHOT_DELAY = 250;
-const PORT = 80;
+const PORT = 8080;
 const WIDTH = 1920;
-const HEIGHT = 1080;
+const HEIGHT = 800;
 const BUSH_SIZE = 200;
+const MINE_DELAY = 10000;
 
 app.use('/',function(req, res, next){
     var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -92,15 +93,14 @@ function reconnect(socket)
 }
 var zombiescount = 0;
 var playerscount = 0;
-
+var mines = [];
 io.on('connection', function(socket) {
   var player = '';
   var last_shot = 0;
   var spawned = false;
   var type = "";
+  var minescount = 3;
   console.log('[Info] Nuovo utente collegato ' + socket.id);
-
-  socket.emit('bushes', bushes);
 
   socket.emit('playerscount', {players:playerscount,zombies:zombiescount});
 
@@ -108,7 +108,7 @@ io.on('connection', function(socket) {
     if(existPlayer(socket.id))
     {
       console.log("[Info] Giocatore duplicato, lo disconnetto!");
-      socket.disconnect(true);
+      //socket.disconnect(true);
     }
     else {
       type = data.IMAGE.replace("img/","").replace(".png","");
@@ -123,6 +123,8 @@ io.on('connection', function(socket) {
         zombiescount++;
       console.log('[Info] Nuovo giocatore caricato!');
       io.sockets.emit('log', {message:'[Info] Nuovo giocatore caricato ' + socket.id + "! (Zombies " + zombiescount + ", Players " + playerscount +")"});
+      socket.emit('bushes', bushes);
+      socket.emit('mines', mines);
     }
   });
 
@@ -137,10 +139,44 @@ io.on('connection', function(socket) {
     io.sockets.emit('move', getPlayers());
   });
 
+  socket.on('exploded', function(data) {
+    var id = data.id;
+    for(var i = 0; i < mines.length; i++)
+    {
+      var m = mines[i];
+      if(m.ID == id)
+      {
+        var index = mines.indexOf(m);
+        if (index > -1) {
+          mines.splice(index, 1);
+        }
+        io.sockets.emit('exploded', {id:m.ID, name: data.name});
+      }
+    }
+  });
+
+  socket.on('newmine', function(data) {
+    if(minescount <= 0)
+      return;
+
+    if(data.OWNER == socket.id)
+    {
+      minescount--;
+      setTimeout(function(){
+        minescount += 1;
+        socket.emit('minescount', {count:minescount});
+      },MINE_DELAY);
+    }
+    console.log("[Info] Nuova mina di " + data.OWNER + " rimaste: " + minescount);
+    io.sockets.emit('newmine', data);
+    mines.push(data);
+  });
+
   socket.on('disconnect', function(reason) {
     if(!spawned)
     {
       reconnect(socket);
+      return;
     }
     console.log('[Info] Utente disconnesso ' + socket.id);
     io.sockets.emit('log', {message:'[Info] Utente disconnesso ' + socket.id});

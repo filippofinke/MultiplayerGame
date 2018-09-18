@@ -5,7 +5,9 @@ img {
 .player-container {
   position: absolute;
 }
-
+body {
+  margin: 0px;
+}
 .health {
   position: absolute;
   bottom: 0px;
@@ -20,7 +22,7 @@ img {
 }
 
 #game {
-  width: 100%;
+  width: 1920px;
   height: 800px;
   border: 2px solid black;
   border-radius: 5px;
@@ -28,7 +30,7 @@ img {
   display: inline-block;
 }
 #logbox {
-  display: inline-block;
+  text-align: center;
   margin-top: 10px;
   border: 2px solid black;
   height: 50px;
@@ -38,5 +40,5 @@ img {
   overflow-y: auto;
   border-radius: 5px;
   float: right;
-  width: 25%;
+  width: 100%;
 }

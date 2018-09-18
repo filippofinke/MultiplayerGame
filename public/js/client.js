@@ -18,6 +18,8 @@ const PLAYER_SPEED = 5;
 const BULLET_SPEED = 10;
 const BULLET_DAMAGE = 30;
 const BULLET_IMAGE = 'img/arrow.png';
+const MINE_SIZE = 50;
+const MINE_DAMAGE = 99;
 var NAME = '';
 var TYPE = '';
 var HEALTH = 100;
@@ -25,11 +27,13 @@ var players = [];
 var player = '';
 var direction = 'FORWARD';
 var lastKey = '';
+var lastLastKey = '';
 var bushes = [];
 var zombie_count = 0;
 var players_count = 0;
-
 var loaded = 0;
+var mines = [];
+
 
 
 SOCKET.on('playerscount', function(data) {
@@ -94,6 +98,19 @@ function move() {
     DIRECTION: direction
   };
 
+  if(key == 'e')
+  {
+    SOCKET.emit('newmine', {
+      SQUAD: TYPE,
+      X: position.X,
+      Y: position.Y,
+      OWNER: SOCKET.id,
+      ID: makeid()
+    });
+    key = lastLastKey;
+    lastKey = lastLastKey;
+  }
+
   switch (key) {
 
     case 'w':
@@ -127,6 +144,14 @@ function move() {
     position.Y = 20;
   } else if (position.Y > GAME_Y - PLAYER_HEIGHT) {
     position.Y = GAME_Y  - PLAYER_HEIGHT;
+  }
+
+  for (var i = 0; i < mines.length; i++) {
+    var mine = mines[i];
+    if(position.X >= mine.X && position.X <= mine.X + MINE_SIZE && position.Y >= mine.Y && position.Y <= mine.Y + MINE_SIZE && mine.SQUAD != TYPE && mine.EXPLODED == 0)
+    {
+      SOCKET.emit('exploded', {id:mine.ID, name: SOCKET.id});
+    }
   }
 
   player.style.top = '' + position.Y + 'px';
@@ -359,9 +384,9 @@ function removeArray(name, array) {
   }
 }
 
-function damage(p)
+function damage(p, damage = BULLET_DAMAGE)
 {
-  var life = Number(p.element.getElementsByTagName("p")[0].innerHTML.replace("%","")) - BULLET_DAMAGE;
+  var life = Number(p.element.getElementsByTagName("p")[0].innerHTML.replace("%","")) - damage;
   var color = "green";
   if(life < 30)
   {
@@ -393,6 +418,7 @@ function moveInterval(event) {
   }
   else
   {
+    lastLastKey = lastKey;
     lastKey = event.key;
   }
 }
@@ -414,17 +440,78 @@ function logBox(text)
   document.getElementById('logbox').innerHTML = text + '<br>' + document.getElementById('logbox').innerHTML;
 }
 
-function randomMine()
+function spawnMine(x,y,squad,owner, size, id)
 {
-  var x = getRandomNumber(0, GAME_X - 50);
-  var y = getRandomNumber(0, GAME_Y - 50);
   var mine = document.createElement('img');
-  mine.src = "img/mine.png";
+  mine.src = "img/" + squad + "mine.png";
   mine.alt = "mine";
-  mine.style.width = 50 + "px";
-  mine.style.height = 50 + "px";
+  mine.style.width = size + "px";
+  mine.style.height = size + "px";
   mine.style.top = Number(y) + "px";
   mine.style.left = Number(x) + "px";
   mine.style.zIndex = "0";
+  mine.setAttribute("id", id);
   GAME.appendChild(mine);
+  var t = {
+    MINE: mine,
+    EXPLODED: 0,
+    SQUAD: squad,
+    X: x,
+    Y: y,
+    OWNER: owner,
+    ID: id
+  }
+  return t;
 }
+function makeid() {
+  var text = "";
+  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+  for (var i = 0; i < 5; i++)
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+  return text;
+}
+
+function deleteMine(e)
+{
+  e.src = "img/explosion.gif";
+  setTimeout(function() {
+    e.remove();
+    var el = "";
+    for(var i = 0; i < mines.length; i++)
+    {
+       if(mines[i].MINE == e)
+       {
+        mines.splice(i, 1);
+        break;
+       }
+    }
+  }, 1000);
+}
+
+SOCKET.on('exploded', function(data){
+  for(var i = 0; i < players.length; i++)
+  {
+    console.log(data.name + " " + players[i].name);
+    if(players[i].name == data.name)
+    {
+      damage(players[i], MINE_DAMAGE);
+    }
+  }
+  deleteMine(document.getElementById(data.id));
+});
+
+SOCKET.on('mines', function(data){
+  data.forEach(function(element) {
+    mines.push(spawnMine(element.X, element.Y, element.SQUAD, element.OWNER, MINE_SIZE, element.ID));
+  });
+});
+
+SOCKET.on('minescount', function(data){
+  logBox("[Info] Hai ricevuto una nuova mina, ora ne hai: " + data.count);
+});
+
+SOCKET.on('newmine', function(data){
+  mines.push(spawnMine(data.X, data.Y, data.SQUAD, data.OWNER, MINE_SIZE, data.ID));
+});
