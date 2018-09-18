@@ -10,7 +10,7 @@
 
 ------------
 ### Test server:
-> https://filippo.site:8080
+> http://filippo.site:8080
 
 ### Come installarlo:
 * Scaricare ed installare nodejs
