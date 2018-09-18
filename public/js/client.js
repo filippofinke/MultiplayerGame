@@ -414,7 +414,9 @@ function moveInterval(event) {
   console.log(event);
   if(event.key == ' ')
   {
+    event.preventDefault();
     shot();
+    return;
   }
   else
   {
