@@ -50,7 +50,6 @@ SOCKET.on('playerscount', function(data) {
   GAME_X = Number(window.getComputedStyle(GAME).getPropertyValue('width').replace("px",""));
   GAME_Y = Number(window.getComputedStyle(GAME).getPropertyValue('height').replace("px",""));
   spawnPlayer();
-  bushes.forEach(spawnBush);
   setInterval(move, 20);
 });
 
@@ -362,6 +361,7 @@ SOCKET.on('reconnect', function() {
 
 SOCKET.on('bushes', function(data){
   bushes = data;
+  bushes.forEach(spawnBush);
 });
 
 function spawnBush(item, index)

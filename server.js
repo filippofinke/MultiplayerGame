@@ -103,7 +103,7 @@ io.on('connection', function(socket) {
   console.log('[Info] Nuovo utente collegato ' + socket.id);
 
   socket.emit('playerscount', {players:playerscount,zombies:zombiescount});
-
+  socket.emit('bushes', bushes);
   socket.on('new', function(data) {
     if(existPlayer(socket.id))
     {
@@ -123,7 +123,6 @@ io.on('connection', function(socket) {
         zombiescount++;
       console.log('[Info] Nuovo giocatore caricato!');
       io.sockets.emit('log', {message:'[Info] Nuovo giocatore caricato ' + socket.id + "! (Zombies " + zombiescount + ", Players " + playerscount +")"});
-      socket.emit('bushes', bushes);
       socket.emit('mines', mines);
     }
   });
