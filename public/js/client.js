@@ -5,7 +5,11 @@ if(!DEBUG)
 }
 
 const IMAGES = ['player.png','zombie.png'];
-const SOCKET = io();
+var SOCKET = io();
+window.onload = function(){
+  console.log("ALL LOADED");
+  bushes.forEach(spawnBush);
+};
 var IMAGE = '';
 let GAME = '';
 let GAME_X;
@@ -361,7 +365,6 @@ SOCKET.on('reconnect', function() {
 
 SOCKET.on('bushes', function(data){
   bushes = data;
-  bushes.forEach(spawnBush);
 });
 
 function spawnBush(item, index)
