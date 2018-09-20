@@ -2,7 +2,10 @@
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
-var io = require('socket.io')(http);
+var io = require('socket.io')(http, {
+  pingInterval: 2500,
+  pingTimeout: 500
+});
 const util = require('util');
 const SHOT_DELAY = 250;
 const PORT = 8080;
