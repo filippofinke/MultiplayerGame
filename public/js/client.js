@@ -5,7 +5,7 @@ if(!DEBUG)
 }
 
 const IMAGES = ['player.png','zombie.png'];
-const SOCKET = io();
+var SOCKET;
 var IMAGE = '';
 let GAME = '';
 let GAME_X;
@@ -31,12 +31,92 @@ var lastLastKey = '';
 var bushes = [];
 var zombie_count = 0;
 var players_count = 0;
-var loaded = 0;
 var mines = [];
+var dead = false;
 
+function documentLoaded()
+{
+  document.body.style.background = "";
+  document.getElementById("container").style.display = "block";
 
+  console.log("Gioco caricato.");
+  SOCKET = io();
 
-SOCKET.on('playerscount', function(data) {
+  SOCKET.on('bushes', function(data){
+    data.forEach(spawnBush);
+  });
+
+  SOCKET.on('log', function(data) {
+    logBox(data.message);
+  });
+
+  SOCKET.on('bullet', function(data)
+  {
+    spawnCustomBullet(data.OWNER, data.X, data.Y, data.DIRECTION, data.SQUAD);
+  });
+
+  SOCKET.on('minescount', function(data){
+    logBox("[Info] Hai ricevuto una nuova mina, ora ne hai: " + data.count);
+  });
+
+  SOCKET.on('mines', function(data){
+    data.forEach(function(element) {
+      mines.push(spawnMine(element.X, element.Y, element.SQUAD, element.OWNER, MINE_SIZE, element.ID));
+    });
+  });
+
+  SOCKET.on('newmine', function(data){
+    mines.push(spawnMine(data.X, data.Y, data.SQUAD, data.OWNER, MINE_SIZE, data.ID));
+  });
+
+  SOCKET.on('reconnect', function() {
+    reconnect();
+  });
+
+  SOCKET.on('disconnect', function() {
+    disconnect();
+  });
+
+  SOCKET.on('quit', function(data) {
+    quit(data);
+  });
+
+  SOCKET.on('move', function(data) {
+    moveplayers(data);
+  });
+
+  SOCKET.on('update', function(data) {
+    update(data);
+  });
+
+  SOCKET.on('new', function(data) {
+    newplayers(data);
+  });
+
+  SOCKET.on('playerscount', function(data) {
+    playerscount(data);
+  });
+
+  SOCKET.on('exploded', function(data){
+    exploded(data);
+  });
+}
+
+function exploded(data)
+{
+  for(var i = 0; i < players.length; i++)
+  {
+    console.log(data.name + " " + players[i].name);
+    if(players[i].name == data.name)
+    {
+      damage(players[i], MINE_DAMAGE);
+    }
+  }
+  deleteMine(document.getElementById(data.id));
+}
+
+function playerscount(data)
+{
   var zombies = data.zombies;
   var players = data.players;
   var index = 0;
@@ -45,14 +125,108 @@ SOCKET.on('playerscount', function(data) {
   else
     index = 1;
   IMAGE = 'img/' + IMAGES[index];
-  loaded++;
   GAME = document.getElementById('game');
   GAME_X = Number(window.getComputedStyle(GAME).getPropertyValue('width').replace("px",""));
   GAME_Y = Number(window.getComputedStyle(GAME).getPropertyValue('height').replace("px",""));
   spawnPlayer();
-  bushes.forEach(spawnBush);
   setInterval(move, 20);
-});
+}
+
+function newplayers(data)
+{
+  console.log('Carico i giocatori');
+  for (var i = 0; i < data.length; i++) {
+    var p = '';
+    if (data[i].name != NAME) {
+      p = createPlayer(data[i].name, data[i].x, data[i].y,data[i].image, data[i].direction,100);
+    } else {
+      p = player;
+      TYPE = data[i].type;
+    }
+    if(data[i].type == "zombie")
+    {
+      zombie_count += 1;
+    }
+    else {
+      players_count += 1;
+    }
+    players.push({element: p, name: data[i].name, health: 100, type: data[i].type, x: data[i].x, y: data[i].y, direction: data[i].direction, image: data[i].image});
+  }
+  displayCounter();
+}
+
+function update(data)
+{
+  console.log('Nuovo giocatore connesso');
+  var p = createPlayer(data.name, data.x, data.y,data.image, data.direction);
+  players.push({element: p, name: data.name, health: 100, type: data.type, x: data.x, y: data.y, direction: data.direction, image: data.image});
+  if(data.type == "zombie")
+  {
+    zombie_count += 1;
+  }
+  else {
+    players_count += 1;
+  }
+  displayCounter();
+}
+
+function moveplayers(data)
+{
+  for (var a = 0; a < data.length; a++) {
+    for (var i = 0; i < players.length; i++) {
+      if (data[a].name == NAME) {
+        players[i].x = data[a].x;
+        players[i].y = data[a].y;
+        players[i].direction = data[a].direction;
+      }
+      else if (data[a].name == players[i].name) {
+        players[i].element.style.top = Number(data[a].y) + 'px';
+        players[i].element.style.left = Number(data[a].x) + 'px';
+        players[i].x = Number(data[a].x);
+        players[i].y = Number(data[a].y);
+        players[i].direction = data[a].direction;
+        players[i].element.getElementsByTagName("img")[0].src = getImage(data[a].image, data[a].direction);
+      }
+    }
+  }
+}
+
+function quit(data)
+{
+  console.log('Un utente si è disconnesso');
+  for (var i = 0; i < players.length; i++) {
+    if (players[i].name == data.name) {
+      if(players[i].type == "zombie")
+      {
+        zombie_count -= 1;
+      }
+      else
+      {
+        players_count -= 1;
+      }
+      players[i].element.remove();
+      removeArray(players[i], players);
+      break;
+    }
+  }
+  displayCounter();
+}
+
+function disconnect()
+{
+  if(dead)
+    return;
+  logBox("[Errore] Connessione con il server persa!");
+  location.reload();
+}
+
+function reconnect()
+{
+  logBox("[Errore] Il server ha chiesto di ricollegarsi!");
+  setTimeout(function(){
+    location.reload();
+  },500);
+}
 
 function spawnPlayer() {
   NAME = SOCKET.id;
@@ -162,8 +336,6 @@ function move() {
 
 function shot()
 {
-  if(loaded < 2)
-    return;
   console.log("Sparo verso: " + direction);
   var x =  Number(player.style.left.replace('px', ''));
   var y =  Number(player.style.top.replace('px', ''));
@@ -186,8 +358,6 @@ function deleteBullet(element, blife)
 
 function moveBullet(e, dir, blife, owner, squad)
 {
-  if(loaded < 2)
-    return;
   var x =  Number(e.style.left.replace('px', ''));
   var y =  Number(e.style.top.replace('px', ''));
 
@@ -238,8 +408,6 @@ function moveBullet(e, dir, blife, owner, squad)
 
 function spawnCustomBullet(owner, x, y, dir, squad)
 {
-  if(loaded < 2)
-    return;
   console.log("Creato nuovo sparo verso " + direction + " di " + owner + "!");
   var bullet = document.createElement("img");
   bullet.style.width = BULLET_WIDTH + "px";
@@ -256,113 +424,6 @@ function spawnCustomBullet(owner, x, y, dir, squad)
     deleteBullet(bullet,blife);
   }, 3000);
 }
-
-SOCKET.on('bullet', function(data)
-{
-  if(loaded < 2)
-    return;
-  spawnCustomBullet(data.OWNER, data.X, data.Y, data.DIRECTION, data.SQUAD);
-});
-
-SOCKET.on('new', function(data) {
-  console.log('Carico i giocatori');
-  for (var i = 0; i < data.length; i++) {
-    var p = '';
-    if (data[i].name != NAME) {
-      p = createPlayer(data[i].name, data[i].x, data[i].y,data[i].image, data[i].direction,100);
-    } else {
-      p = player;
-      TYPE = data[i].type;
-    }
-    if(data[i].type == "zombie")
-    {
-      zombie_count += 1;
-    }
-    else {
-      players_count += 1;
-    }
-    players.push({element: p, name: data[i].name, health: 100, type: data[i].type, x: data[i].x, y: data[i].y, direction: data[i].direction, image: data[i].image});
-  }
-  displayCounter();
-  loaded++;
-});
-
-SOCKET.on('update', function(data) {
-  console.log('Nuovo giocatore connesso');
-  var p = createPlayer(data.name, data.x, data.y,data.image, data.direction);
-  players.push({element: p, name: data.name, health: 100, type: data.type, x: data.x, y: data.y, direction: data.direction, image: data.image});
-  if(data.type == "zombie")
-  {
-    zombie_count += 1;
-  }
-  else {
-    players_count += 1;
-  }
-  displayCounter();
-});
-
-SOCKET.on('move', function(data) {
-  for (var a = 0; a < data.length; a++) {
-    for (var i = 0; i < players.length; i++) {
-      if (data[a].name == NAME) {
-        players[i].x = data[a].x;
-        players[i].y = data[a].y;
-        players[i].direction = data[a].direction;
-      }
-      else if (data[a].name == players[i].name) {
-        players[i].element.style.top = Number(data[a].y) + 'px';
-        players[i].element.style.left = Number(data[a].x) + 'px';
-        players[i].x = Number(data[a].x);
-        players[i].y = Number(data[a].y);
-        players[i].direction = data[a].direction;
-        players[i].element.getElementsByTagName("img")[0].src = getImage(data[a].image, data[a].direction);
-      }
-    }
-  }
-});
-
-SOCKET.on('quit', function(data) {
-  console.log('Un utente si è disconnesso');
-  for (var i = 0; i < players.length; i++) {
-    if (players[i].name == data.name) {
-      if(players[i].type == "zombie")
-      {
-        zombie_count -= 1;
-      }
-      else
-      {
-        players_count -= 1;
-      }
-      players[i].element.remove();
-      removeArray(players[i], players);
-      break;
-    }
-  }
-  displayCounter();
-});
-
-SOCKET.on('log', function(data) {
-  logBox(data.message);
-});
-var dead = false;
-SOCKET.on('disconnect', function() {
-  if(dead)
-    return;
-  logBox("[Errore] Connessione con il server persa!");
-  document.write("Mi ricollego in 1 secondi!");
-  setTimeout(function(){location.reload()},1000);
-});
-
-SOCKET.on('reconnect', function() {
-  logBox("[Errore] Il server ha chiesto di ricollegarsi!");
-  setTimeout(function(){
-    location.reload();
-  },500);
-});
-
-SOCKET.on('bushes', function(data){
-  bushes = data;
-});
 
 function spawnBush(item, index)
 {
@@ -491,29 +552,3 @@ function deleteMine(e)
     }
   }, 1000);
 }
-
-SOCKET.on('exploded', function(data){
-  for(var i = 0; i < players.length; i++)
-  {
-    console.log(data.name + " " + players[i].name);
-    if(players[i].name == data.name)
-    {
-      damage(players[i], MINE_DAMAGE);
-    }
-  }
-  deleteMine(document.getElementById(data.id));
-});
-
-SOCKET.on('mines', function(data){
-  data.forEach(function(element) {
-    mines.push(spawnMine(element.X, element.Y, element.SQUAD, element.OWNER, MINE_SIZE, element.ID));
-  });
-});
-
-SOCKET.on('minescount', function(data){
-  logBox("[Info] Hai ricevuto una nuova mina, ora ne hai: " + data.count);
-});
-
-SOCKET.on('newmine', function(data){
-  mines.push(spawnMine(data.X, data.Y, data.SQUAD, data.OWNER, MINE_SIZE, data.ID));
-});

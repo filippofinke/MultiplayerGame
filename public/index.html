@@ -6,8 +6,8 @@
   <script src="js/client.js"></script>
   <link rel="stylesheet" type="text/css" href="css/style.css">
 </head>
-<body onkeypress="moveInterval(event)">
-  <div>
+<body onload="documentLoaded()" onkeypress="moveInterval(event)" style="background:url('img/loading.gif'); background-position: center; background-repeat: no-repeat; background-attachment: fixed;">
+  <div id="container" style="display: none;">
     <div id="game">
     </div>
     <div id="logbox">
