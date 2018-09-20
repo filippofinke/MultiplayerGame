@@ -20,7 +20,6 @@ const BULLET_DAMAGE = 30;
 const BULLET_IMAGE = 'img/arrow.png';
 const MINE_SIZE = 50;
 const MINE_DAMAGE = 99;
-const MINE_DELAY = 15000;
 var NAME = '';
 var TYPE = '';
 var HEALTH = 100;
@@ -70,9 +69,6 @@ function documentLoaded()
   SOCKET.on('newmine', function(data){
     var temp = spawnMine(data.X, data.Y, data.SQUAD, data.OWNER, MINE_SIZE, data.ID);
     mines.push(temp);
-    setTimeout(function(){
-      deleteMine(document.getElementById(data.ID));
-    }, MINE_DELAY);
   });
 
   SOCKET.on('reconnect', function() {

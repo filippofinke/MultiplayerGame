@@ -205,6 +205,7 @@ io.on('connection', function(socket) {
       if (index > -1) {
         mines.splice(index, 1);
       }
+      io.sockets.emit('exploded', {id:data.ID, name: "SERVER"});
       console.log("[Info] RIMOSSA UNA MINA PER DELAY");
     }, MINE_DESPAWN_DELAY);
   });
