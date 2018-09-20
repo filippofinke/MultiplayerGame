@@ -13,6 +13,7 @@ const WIDTH = 1920;
 const HEIGHT = 800;
 const BUSH_SIZE = 200;
 const MINE_DELAY = 10000;
+const MINE_DESPAWN_DELAY = 15000;
 
 
 
@@ -199,6 +200,13 @@ io.on('connection', function(socket) {
     console.log("[Info] Nuova mina di " + data.OWNER + " rimaste: " + minescount);
     io.sockets.emit('newmine', data);
     mines.push(data);
+    setTimeout(function(){
+      var index = mines.indexOf(data);
+      if (index > -1) {
+        mines.splice(index, 1);
+      }
+      console.log("[Info] RIMOSSA UNA MINA PER DELAY");
+    }, MINE_DESPAWN_DELAY);
   });
 
   socket.on('disconnect', function(reason) {
