@@ -14,6 +14,33 @@ const HEIGHT = 800;
 const BUSH_SIZE = 200;
 const MINE_DELAY = 10000;
 
+
+
+var requests = [];
+var requestTrimThreshold = 1000;
+var requestTrimSize = 800;
+app.use(function(req, res, next) {
+    requests.push(Date.now());
+    if (requests.length > requestTrimThreshold) {
+        requests = requests.slice(0, requests.length - requestTrimSize);
+    }
+    next();
+});
+
+app.get("/reqs", function(req, res) {
+    var now = Date.now();
+    var aSecAgo = now - (1000);
+    var cnt = 0;
+    for (var i = requests.length - 1; i >= 0; i--) {
+        if (requests[i] >= aSecAgo) {
+            ++cnt;
+        } else {
+            break;
+        }
+    }
+    res.json({reqs: cnt, time:aSecAgo});
+});
+
 app.use('/',function(req, res, next){
     var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
    console.log("[" + ip + "] " + req.originalUrl);

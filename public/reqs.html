@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Multiplayer Game Requests</title>
+    <script src="js/chart.js"></script>
+  </head>
+  <body>
+    <h1>MultiplayerGame - Number of requests/sec</h1>
+  <canvas id="myChart" height="50px"></canvas>
+  <script>
+
+  var labels = [0,0,0,0,0,0,0,0,0,0];
+  var data = [0,0,0,0,0,0,0,0,0,0];
+
+  var ctx = document.getElementById("myChart").getContext('2d');
+  var myChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+          labels: labels,
+          datasets: [{
+              label: '# of requests/s',
+              data: data,
+              backgroundColor: [
+                  'rgba(255, 99, 132, 0.2)',
+                  'rgba(54, 162, 235, 0.2)',
+                  'rgba(255, 206, 86, 0.2)',
+                  'rgba(75, 192, 192, 0.2)',
+                  'rgba(153, 102, 255, 0.2)',
+                  'rgba(255, 159, 64, 0.2)'
+              ],
+              borderColor: [
+                  'rgba(255,99,132,1)',
+                  'rgba(54, 162, 235, 1)',
+                  'rgba(255, 206, 86, 1)',
+                  'rgba(75, 192, 192, 1)',
+                  'rgba(153, 102, 255, 1)',
+                  'rgba(255, 159, 64, 1)'
+              ],
+              borderWidth: 1
+          }]
+      },
+      options: {
+          scales: {
+              yAxes: [{
+                  ticks: {
+                      beginAtZero:true
+                  }
+              }]
+          }
+      }
+  });
+
+function getRequests()
+{
+  var xmlhttp = new XMLHttpRequest();
+  var url = "reqs";
+  xmlhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+          var d = JSON.parse(this.responseText);
+          labels.splice(0, 1);
+          data.splice(0, 1);
+          var date = new Date(d.time);
+          var hours = date.getHours();
+          var minutes = "0" + date.getMinutes();
+          var seconds = "0" + date.getSeconds();
+          var formattedTime = hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
+          labels.push(formattedTime);
+          data.push(d.reqs);
+          myChart.data.labels = labels;
+          myChart.data.datasets.forEach((dataset) => {
+            dataset.data = data;
+          });
+          myChart.update();
+      }
+  };
+  xmlhttp.open("GET", url, true);
+  xmlhttp.send();
+}setInterval(getRequests, 1000);
+
+</script>
+  </body>
+</html>
