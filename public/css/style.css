@@ -2,6 +2,17 @@ img {
   position: absolute;
 }
 
+#players {
+  position: fixed;
+  text-align: center;
+  padding: 2px;
+  width: 120px;
+  font-size: 9px;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 3;
+  color: white;
+}
+
 #alert {
   position: fixed;
   text-align: center;
@@ -13,7 +24,6 @@ img {
   z-index: 3;
   color: white;
   bottom: 20%;
-  display: none;
 }
 
 .player-container {

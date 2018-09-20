@@ -141,6 +141,11 @@ function playerscount(data)
   setInterval(move, 20);
 }
 
+function setPlayers(players)
+{
+  document.getElementById("players").innerHTML = "<h1>Players: " + players + "</h1>";
+}
+
 function newplayers(data)
 {
   console.log('Carico i giocatori');
@@ -523,6 +528,7 @@ function getImage(img, dir)
 
 function displayCounter()
 {
+  setPlayers(zombie_count + players_count);
   logBox("[Info] Zombie: " + zombie_count + " Umani: " + players_count);
 }
 
