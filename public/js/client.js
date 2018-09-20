@@ -122,7 +122,7 @@ function playerscount(data)
   var index = 0;
   if(zombies > players)
     index = 0;
-  else
+    else
     index = 1;
   IMAGE = 'img/' + IMAGES[index];
   GAME = document.getElementById('game');
@@ -215,16 +215,22 @@ function quit(data)
 function disconnect()
 {
   if(dead)
+  {
+    document.getElementById("container").innerHTML = "";
+    setTimeout(function(){
+      window.location.reload(true);
+    },1000);
     return;
+  }
   logBox("[Errore] Connessione con il server persa!");
-  location.reload();
+  window.location.reload(true);
 }
 
 function reconnect()
 {
   logBox("[Errore] Il server ha chiesto di ricollegarsi!");
   setTimeout(function(){
-    location.reload();
+    window.location.reload(true);
   },500);
 }
 
@@ -322,7 +328,11 @@ function move() {
 
   for (var i = 0; i < mines.length; i++) {
     var mine = mines[i];
-    if(position.X >= mine.X && position.X <= mine.X + MINE_SIZE && position.Y >= mine.Y && position.Y <= mine.Y + MINE_SIZE && mine.SQUAD != TYPE && mine.EXPLODED == 0)
+
+    var mp = {x1:mine.X,x2:mine.X + MINE_SIZE,y1:mine.Y,y2:mine.Y + MINE_SIZE};
+    var pp = {x1:position.X,x2:position.X + PLAYER_WIDTH,y1:position.Y,y2:position.Y + PLAYER_HEIGHT};
+
+    if( overlaps(pp,mp) && mine.SQUAD != TYPE && mine.EXPLODED == 0)
     {
       SOCKET.emit('exploded', {id:mine.ID, name: SOCKET.id});
     }
@@ -332,6 +342,12 @@ function move() {
   player.style.left = '' + position.X + 'px';
   player.getElementsByTagName("img")[0].src = getImage(IMAGE, direction);
   SOCKET.emit('move', position);
+}
+
+function overlaps(a, b) {
+	if (a.x1 >= b.x2 || b.x1 >= a.x2) return false;
+	if (a.y1 >= b.y2 || b.y1 >= a.y2) return false;
+	return true;
 }
 
 function shot()
@@ -465,6 +481,7 @@ function damage(p, damage = BULLET_DAMAGE)
     p.element.remove();
     if(p.name == NAME)
     {
+      dead = true;
       SOCKET.disconnect();
       document.body.style.backgroundImage = "url('img/deadscreen.gif')";
     }
