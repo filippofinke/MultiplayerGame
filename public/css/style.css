@@ -2,6 +2,20 @@ img {
   position: absolute;
 }
 
+#alert {
+  position: fixed;
+  text-align: center;
+  padding: 30px;
+  width: 75%;
+  left: 50%;
+  background-color: rgba(0,0,0,0.5);
+  margin-left: -37.5%;
+  z-index: 3;
+  color: white;
+  bottom: 20%;
+  display: none;
+}
+
 .player-container {
   position: absolute;
 }

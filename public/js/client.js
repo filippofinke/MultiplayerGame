@@ -57,6 +57,7 @@ function documentLoaded()
 
   SOCKET.on('minescount', function(data){
     logBox("[Info] Hai ricevuto una nuova mina, ora ne hai: " + data.count);
+    alertBox("<h1>Hai ricevuto una nuova mina, ora ne hai: " + data.count + "</h1>");
   });
 
   SOCKET.on('mines', function(data){
@@ -100,6 +101,14 @@ function documentLoaded()
   SOCKET.on('exploded', function(data){
     exploded(data);
   });
+}
+function alertBox(message)
+{
+  document.getElementById("alert").innerHTML = message;
+  document.getElementById("alert").style.display = "block";
+  setTimeout(function(){
+    document.getElementById("alert").style.display = "none";
+  },2000);
 }
 
 function exploded(data)
@@ -157,6 +166,7 @@ function newplayers(data)
 
 function update(data)
 {
+  alertBox("<h1>Nuovo giocatore connesso!</h1>");
   console.log('Nuovo giocatore connesso');
   var p = createPlayer(data.name, data.x, data.y,data.image, data.direction);
   players.push({element: p, name: data.name, health: 100, type: data.type, x: data.x, y: data.y, direction: data.direction, image: data.image});
@@ -193,6 +203,7 @@ function moveplayers(data)
 
 function quit(data)
 {
+  alertBox("<h1>Un utente si è disconnesso!</h1>");
   console.log('Un utente si è disconnesso');
   for (var i = 0; i < players.length; i++) {
     if (players[i].name == data.name) {
