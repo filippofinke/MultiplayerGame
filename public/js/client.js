@@ -38,6 +38,22 @@ var defaultPrevent=function(e){e.preventDefault();}
 document.body.addEventListener("touchstart", defaultPrevent);
 document.body.addEventListener("touchmove" , defaultPrevent);
 
+function detectmob() {
+ if( navigator.userAgent.match(/Android/i)
+ || navigator.userAgent.match(/webOS/i)
+ || navigator.userAgent.match(/iPhone/i)
+ || navigator.userAgent.match(/iPad/i)
+ || navigator.userAgent.match(/iPod/i)
+ || navigator.userAgent.match(/BlackBerry/i)
+ || navigator.userAgent.match(/Windows Phone/i)
+ ){
+    return true;
+  }
+ else {
+    return false;
+  }
+}
+
 function documentLoaded()
 {
   document.body.style.background = "";
@@ -374,7 +390,8 @@ function move() {
   player.style.top = '' + position.Y + 'px';
   player.style.left = '' + position.X + 'px';
   player.getElementsByTagName("img")[0].src = getImage(IMAGE, direction);
-  window.scrollTo(position.X - $(window).width()/2 + PLAYER_WIDTH/2, position.Y - $(window).height()/2 + PLAYER_HEIGHT/2);
+  if(!detectmob())
+    window.scrollTo(position.X - $(window).width()/2 + PLAYER_WIDTH/2, position.Y - $(window).height()/2 + PLAYER_HEIGHT/2);
   SOCKET.emit('move', position);
 }
 
