@@ -36,27 +36,27 @@ var dead = false;
 var options = {
 };
 var manager = nipplejs.create(options);
-console.log(manager);
-
-manager.on('move', function (evt, data) {
-    if('direction' in data)
-    {
-      var angle = data.direction.angle;
-      if(angle == "left")
-        moveInterval({key:"a"});
-      else if(angle == "up")
-        moveInterval({key:"w"});
-      else if(angle == "down")
-        moveInterval({key:"s"});
-      else if(angle == "right")
-        moveInterval({key:"d"});
-    }
-});
 
 function documentLoaded()
 {
   document.body.style.background = "";
   document.getElementById("container").style.display = "block";
+
+  manager.on('move', function (evt, data) {
+      if('direction' in data)
+      {
+        var angle = data.direction.angle;
+        if(angle == "left")
+          moveInterval({key:"a"});
+        else if(angle == "up")
+          moveInterval({key:"w"});
+        else if(angle == "down")
+          moveInterval({key:"s"});
+        else if(angle == "right")
+          moveInterval({key:"d"});
+      }
+  });
+
 
   console.log("Gioco caricato.");
   SOCKET = io();
