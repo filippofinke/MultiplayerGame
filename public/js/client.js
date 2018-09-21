@@ -358,6 +358,7 @@ function move() {
   player.style.top = '' + position.Y + 'px';
   player.style.left = '' + position.X + 'px';
   player.getElementsByTagName("img")[0].src = getImage(IMAGE, direction);
+  window.scrollTo(position.X - $(window).width()/2 + PLAYER_WIDTH/2, position.Y - $(window).height()/2 + PLAYER_HEIGHT/2);
   SOCKET.emit('move', position);
 }
 
