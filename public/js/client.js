@@ -415,9 +415,9 @@ function moveBullet(e, dir, blife, owner, squad)
   var y =  Number(e.style.top.replace('px', ''));
 
   if (x < 0 ||
-    x > GAME_X ||
+    x + BULLET_WIDTH > GAME_X ||
     y < 0 ||
-    y > GAME_Y) {
+    y + BULLET_HEIGHT > GAME_Y) {
       deleteBullet(e, blife);
   }
 
