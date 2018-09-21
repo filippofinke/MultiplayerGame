@@ -33,32 +33,25 @@ var zombie_count = 0;
 var players_count = 0;
 var mines = [];
 var dead = false;
-var options = {
-};
-var manager = nipplejs.create(options);
 
 function documentLoaded()
 {
   document.body.style.background = "";
   document.getElementById("container").style.display = "block";
-
-  manager.on('move', function (evt, data) {
-      if('direction' in data)
-      {
-        var angle = data.direction.angle;
-        if(angle == "left")
-          moveInterval({key:"a"});
-        else if(angle == "up")
-          moveInterval({key:"w"});
-        else if(angle == "down")
-          moveInterval({key:"s"});
-        else if(angle == "right")
-          moveInterval({key:"d"});
-      }
-  });
-
-
   console.log("Gioco caricato.");
+
+  var joystick = new VirtualJoystick({
+          mouseSupport: true,
+		      limitStickTravel: true,
+		      stickRadius: 50
+  });
+  setInterval(function(){
+    lastKey = (joystick.right()	? 'd'	: lastKey);
+    lastKey = (joystick.up()	? 'w'	: lastKey);
+    lastKey = (joystick.left()	? 'a'	: lastKey);
+    lastKey = (joystick.down()	? 's'	: lastKey);
+  }, 1);
+
   SOCKET = io();
 
   SOCKET.on('bushes', function(data){
