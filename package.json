@@ -1,0 +1,26 @@
+{
+  "name": "multiplayergame",
+  "version": "1.0.0",
+  "description": "------------",
+  "main": "server.js",
+  "dependencies": {
+    "body-scroll-lock": "^2.5.7",
+    "express": "^4.16.3",
+    "socket.io": "^2.1.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/filippofinke/MultiplayerGame.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/filippofinke/MultiplayerGame/issues"
+  },
+  "homepage": "https://github.com/filippofinke/MultiplayerGame#readme"
+}
